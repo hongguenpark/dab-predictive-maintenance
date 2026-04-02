@@ -4,42 +4,42 @@
       "name": "ds_equipment_status",
       "displayName": "장비 상태 종합",
       "queryLines": [
-        "SELECT e.equipment_id, e.equipment_name, e.line, e.criticality, e.operating_hours,  ROUND(AVG(s.vibration_rms), 2) as avg_vibration,  ROUND(MAX(s.vibration_rms), 2) as max_vibration,  ROUND(AVG(s.temperature_c), 1) as avg_temperature,  ROUND(MAX(s.temperature_c), 1) as max_temperature,  ROUND(AVG(s.pressure_bar), 1) as avg_pressure,  CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급'       WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험'       WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의'       ELSE '정상' END AS status,  COUNT(*) as reading_countFROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master eJOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_idGROUP BY ALL ORDER BY avg_vibration DESC"
+        "SELECT e.equipment_id, e.equipment_name, e.line, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(MAX(s.vibration_rms), 2) as max_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, ROUND(MAX(s.temperature_c), 1) as max_temperature, ROUND(AVG(s.pressure_bar), 1) as avg_pressure, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status, COUNT(*) as reading_count FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY avg_vibration DESC"
       ]
     },
     {
       "name": "ds_status_counts",
       "displayName": "상태별 장비 수",
       "queryLines": [
-        "WITH eq AS (  SELECT e.equipment_id,    CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급'         WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험'         WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의'         ELSE '정상' END AS status  FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e  JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id  GROUP BY e.equipment_id) SELECT status, COUNT(*) as cnt FROM eq GROUP BY status"
+        "WITH eq AS (SELECT e.equipment_id, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as cnt FROM eq GROUP BY status"
       ]
     },
     {
       "name": "ds_vibration_trend",
       "displayName": "진동 추이",
       "queryLines": [
-        "SELECT equipment_id, DATE(timestamp) as dt,  ROUND(AVG(vibration_rms), 2) as avg_vibFROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readingsGROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
+        "SELECT equipment_id, DATE(timestamp) as dt, ROUND(AVG(vibration_rms), 2) as avg_vib FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
       ]
     },
     {
       "name": "ds_temp_trend",
       "displayName": "온도 추이",
       "queryLines": [
-        "SELECT equipment_id, DATE(timestamp) as dt,  ROUND(AVG(temperature_c), 1) as avg_tempFROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readingsGROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
+        "SELECT equipment_id, DATE(timestamp) as dt, ROUND(AVG(temperature_c), 1) as avg_temp FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
       ]
     },
     {
       "name": "ds_vib_by_equip",
       "displayName": "장비별 진동",
       "queryLines": [
-        "SELECT e.equipment_name,  ROUND(AVG(s.vibration_rms), 2) as avg_vibrationFROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master eJOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_idGROUP BY e.equipment_name ORDER BY avg_vibration DESC"
+        "SELECT e.equipment_name, ROUND(AVG(s.vibration_rms), 2) as avg_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_vibration DESC"
       ]
     },
     {
       "name": "ds_temp_by_equip",
       "displayName": "장비별 온도",
       "queryLines": [
-        "SELECT e.equipment_name,  ROUND(AVG(s.temperature_c), 1) as avg_temperatureFROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master eJOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_idGROUP BY e.equipment_name ORDER BY avg_temperature DESC"
+        "SELECT e.equipment_name, ROUND(AVG(s.temperature_c), 1) as avg_temperature FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_temperature DESC"
       ]
     },
     {
@@ -53,21 +53,21 @@
       "name": "ds_kpi_alert",
       "displayName": "KPI 위험장비",
       "queryLines": [
-        "SELECT COUNT(*) as alert_cnt FROM (  SELECT e.equipment_id FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e  JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id  GROUP BY e.equipment_id HAVING AVG(s.vibration_rms)>7 OR AVG(s.temperature_c)>75)"
+        "SELECT COUNT(*) as alert_cnt FROM (SELECT e.equipment_id FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id HAVING AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75)"
       ]
     },
     {
       "name": "ds_anomaly_hour",
       "displayName": "시간대별 이상",
       "queryLines": [
-        "SELECT HOUR(timestamp) as hr, COUNT(*) as cntFROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readingsWHERE vibration_rms > 7.0 OR temperature_c > 75.0GROUP BY HOUR(timestamp) ORDER BY hr"
+        "SELECT HOUR(timestamp) as hr, COUNT(*) as cnt FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings WHERE vibration_rms > 7.0 OR temperature_c > 75.0 GROUP BY HOUR(timestamp) ORDER BY hr"
       ]
     },
     {
       "name": "ds_scatter",
       "displayName": "진동vs온도",
       "queryLines": [
-        "SELECT e.equipment_name, e.criticality,  ROUND(AVG(s.vibration_rms),2) as avg_vib,  ROUND(AVG(s.temperature_c),1) as avg_tempFROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master eJOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_idGROUP BY ALL"
+        "SELECT e.equipment_name, e.criticality, ROUND(AVG(s.vibration_rms), 2) as avg_vib, ROUND(AVG(s.temperature_c), 1) as avg_temp FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL"
       ]
     }
   ],
@@ -227,7 +227,7 @@
                 },
                 "y": {
                   "fieldName": "avg_vibration",
-                  "displayName": "평균 진동 (RMS)",
+                  "displayName": "평균 진동",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -277,7 +277,7 @@
                 },
                 "y": {
                   "fieldName": "avg_temperature",
-                  "displayName": "평균 온도 (℃)",
+                  "displayName": "평균 온도",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -464,7 +464,7 @@
                 },
                 "y": {
                   "fieldName": "avg_vib",
-                  "displayName": "평균 진동 (RMS)",
+                  "displayName": "평균 진동",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -525,7 +525,7 @@
                 },
                 "y": {
                   "fieldName": "avg_temp",
-                  "displayName": "평균 온도 (℃)",
+                  "displayName": "평균 온도",
                   "scale": {
                     "type": "quantitative"
                   }
