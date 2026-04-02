@@ -2,7 +2,7 @@
 -- 예측 정비(Predictive Maintenance) - Unity Catalog 함수
 
 -- 1. 진동 데이터 기반 장비 상태 판별 함수
-CREATE OR REPLACE FUNCTION hg_demos.predictive_maintenance.assess_vibration_status(
+CREATE OR REPLACE FUNCTION ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(
   vibration_rms DOUBLE,
   temperature DOUBLE
 )
@@ -18,7 +18,7 @@ RETURN
   END;
 
 -- 2. 잔여 수명(RUL) 추정 함수
-CREATE OR REPLACE FUNCTION hg_demos.predictive_maintenance.estimate_rul(
+CREATE OR REPLACE FUNCTION ebay_anomaly_detection_catalog.predictive_maintenance.estimate_rul(
   operating_hours DOUBLE,
   avg_vibration DOUBLE,
   avg_temperature DOUBLE,
@@ -36,7 +36,7 @@ RETURN
   );
 
 -- 3. 정비 우선순위 점수 계산 함수
-CREATE OR REPLACE FUNCTION hg_demos.predictive_maintenance.maintenance_priority_score(
+CREATE OR REPLACE FUNCTION ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_priority_score(
   rul_hours DOUBLE,
   equipment_criticality STRING,
   last_maintenance_days INT
@@ -58,6 +58,6 @@ RETURN
 
 -- 테스트 실행
 SELECT
-  hg_demos.predictive_maintenance.assess_vibration_status(8.5, 72.0) as status,
-  hg_demos.predictive_maintenance.estimate_rul(5000, 6.0, 65.0, 10000) as rul_hours,
-  hg_demos.predictive_maintenance.maintenance_priority_score(3000, '핵심', 45) as priority;
+  ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(8.5, 72.0) as status,
+  ebay_anomaly_detection_catalog.predictive_maintenance.estimate_rul(5000, 6.0, 65.0, 10000) as rul_hours,
+  ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_priority_score(3000, '핵심', 45) as priority;

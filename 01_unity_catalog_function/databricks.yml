@@ -1,7 +1,7 @@
 resources:
   schemas:
     predictive_maintenance:
-      catalog_name: hg_demos
+      catalog_name: ebay_anomaly_detection_catalog
       name: predictive_maintenance
       comment: "예측 정비 (Predictive Maintenance) 데모 스키마"
 

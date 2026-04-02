@@ -87,17 +87,17 @@
     {
       "name": "equipment_status",
       "displayName": "장비 상태",
-      "query": "SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, hg_demos.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status, ROUND(hg_demos.predictive_maintenance.estimate_rul(e.operating_hours, AVG(s.vibration_rms), AVG(s.temperature_c)), 0) as rul_hours FROM hg_demos.predictive_maintenance.equipment_master e JOIN hg_demos.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY rul_hours ASC"
+      "query": "SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status, ROUND(ebay_anomaly_detection_catalog.predictive_maintenance.estimate_rul(e.operating_hours, AVG(s.vibration_rms), AVG(s.temperature_c)), 0) as rul_hours FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY rul_hours ASC"
     },
     {
       "name": "status_counts",
       "displayName": "상태별 장비 수",
-      "query": "WITH eq_status AS (SELECT e.equipment_id, hg_demos.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status FROM hg_demos.predictive_maintenance.equipment_master e JOIN hg_demos.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as count FROM eq_status GROUP BY status"
+      "query": "WITH eq_status AS (SELECT e.equipment_id, ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as count FROM eq_status GROUP BY status"
     },
     {
       "name": "vibration_trend",
       "displayName": "진동 추이",
-      "query": "SELECT equipment_id, DATE(timestamp) as date, ROUND(AVG(vibration_rms), 2) as avg_vibration FROM hg_demos.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY date"
+      "query": "SELECT equipment_id, DATE(timestamp) as date, ROUND(AVG(vibration_rms), 2) as avg_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY date"
     }
   ]
 }

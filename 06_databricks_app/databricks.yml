@@ -7,5 +7,5 @@ resources:
       resources:
         - name: pm-sql-warehouse
           sql_warehouse:
-            id: "6898e1e8ebe84201"
+            id: "86ec93a98d884cde"
             permission: CAN_USE

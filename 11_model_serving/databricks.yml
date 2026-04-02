@@ -4,13 +4,13 @@ resources:
       name: "pm-rul-prediction-hg"
       config:
         served_entities:
-          - entity_name: "hg_demos.predictive_maintenance.rul_prediction_model"
+          - entity_name: "ebay_anomaly_detection_catalog.predictive_maintenance.rul_prediction_model"
             entity_version: "1"
             workload_size: "Small"
             scale_to_zero_enabled: true
       ai_gateway:
         inference_table_config:
-          catalog_name: "hg_demos"
+          catalog_name: "ebay_anomaly_detection_catalog"
           schema_name: "predictive_maintenance"
           table_name_prefix: "rul_inference_log"
           enabled: true

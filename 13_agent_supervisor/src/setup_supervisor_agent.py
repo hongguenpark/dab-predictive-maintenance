@@ -44,19 +44,19 @@ agent_config = {
             "name": "지식_검색_Agent",
             "type": "knowledge_assistant",
             "description": "정비 매뉴얼, 절차서, 가이드 문서를 검색합니다",
-            "knowledge_source": "hg_demos.predictive_maintenance.maintenance_kb_index",
+            "knowledge_source": "ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_kb_index",
             "trigger_keywords": ["매뉴얼", "절차", "가이드", "방법", "어떻게"]
         },
         {
             "name": "데이터_분석_Agent",
             "type": "sql_agent",
             "description": "센서 데이터와 장비 상태를 SQL로 분석합니다",
-            "warehouse_id": "6898e1e8ebe84201",
+            "warehouse_id": "86ec93a98d884cde",
             "allowed_tables": [
-                "hg_demos.predictive_maintenance.equipment_master",
-                "hg_demos.predictive_maintenance.sensor_readings",
-                "hg_demos.predictive_maintenance.equipment_health_daily",
-                "hg_demos.predictive_maintenance.maintenance_alerts"
+                "ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master",
+                "ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings",
+                "ebay_anomaly_detection_catalog.predictive_maintenance.equipment_health_daily",
+                "ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_alerts"
             ],
             "trigger_keywords": ["상태", "데이터", "진동", "온도", "센서", "장비"]
         },
@@ -97,7 +97,7 @@ print(json.dumps(agent_config, ensure_ascii=False, indent=2))
 #     mlflow.pyfunc.log_model(
 #         artifact_path="supervisor_agent",
 #         python_model=PredictiveMaintenanceSupervisor(),
-#         registered_model_name="hg_demos.predictive_maintenance.supervisor_agent"
+#         registered_model_name="ebay_anomaly_detection_catalog.predictive_maintenance.supervisor_agent"
 #     )
 
 print("⚠️ Supervisor Agent는 Databricks UI > AI/BI > AgentBricks에서 수동 구성이 필요합니다.")

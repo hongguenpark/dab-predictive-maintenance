@@ -38,7 +38,7 @@ equipment_schema = StructType([
 ])
 
 df_equipment = spark.createDataFrame(equipment_data, equipment_schema)
-df_equipment.write.mode("overwrite").saveAsTable("hg_demos.predictive_maintenance.equipment_master")
+df_equipment.write.mode("overwrite").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master")
 display(df_equipment)
 
 # COMMAND ----------
@@ -80,7 +80,7 @@ sensor_schema = StructType([
 ])
 
 df_sensors = spark.createDataFrame(sensor_records, sensor_schema)
-df_sensors.write.mode("overwrite").saveAsTable("hg_demos.predictive_maintenance.sensor_readings")
+df_sensors.write.mode("overwrite").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings")
 
 print(f"센서 데이터 {df_sensors.count():,}건 생성 완료")
 

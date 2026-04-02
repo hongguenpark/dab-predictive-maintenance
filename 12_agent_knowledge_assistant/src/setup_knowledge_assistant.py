@@ -32,7 +32,7 @@ knowledge_docs = [
 
 schema = "doc_id STRING, title STRING, content STRING"
 df_docs = spark.createDataFrame(knowledge_docs, schema)
-df_docs.write.mode("overwrite").saveAsTable("hg_demos.predictive_maintenance.maintenance_knowledge_base")
+df_docs.write.mode("overwrite").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_knowledge_base")
 
 print(f"✅ {len(knowledge_docs)}개 정비 문서 적재 완료")
 display(df_docs)
@@ -58,8 +58,8 @@ display(df_docs)
 # # Delta Sync 인덱스 생성
 # vs_client.create_delta_sync_index(
 #     endpoint_name="pm_vs_endpoint",
-#     index_name="hg_demos.predictive_maintenance.maintenance_kb_index",
-#     source_table_name="hg_demos.predictive_maintenance.maintenance_knowledge_base",
+#     index_name="ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_kb_index",
+#     source_table_name="ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_knowledge_base",
 #     pipeline_type="TRIGGERED",
 #     primary_key="doc_id",
 #     embedding_source_column="content",

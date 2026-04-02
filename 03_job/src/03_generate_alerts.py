@@ -7,15 +7,15 @@
 
 from pyspark.sql import functions as F
 
-df_health = spark.table("hg_demos.predictive_maintenance.equipment_health_daily")
-df_equip = spark.table("hg_demos.predictive_maintenance.equipment_master")
+df_health = spark.table("ebay_anomaly_detection_catalog.predictive_maintenance.equipment_health_daily")
+df_equip = spark.table("ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master")
 
 df_alerts = df_health.join(df_equip, "equipment_id").withColumn(
     "status",
-    F.expr("hg_demos.predictive_maintenance.assess_vibration_status(avg_vibration, avg_temperature)")
+    F.expr("ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(avg_vibration, avg_temperature)")
 ).withColumn(
     "rul_hours",
-    F.expr("hg_demos.predictive_maintenance.estimate_rul(operating_hours, avg_vibration, avg_temperature)")
+    F.expr("ebay_anomaly_detection_catalog.predictive_maintenance.estimate_rul(operating_hours, avg_vibration, avg_temperature)")
 ).filter(
     F.col("status").isin("위험", "긴급")
 ).withColumn(
@@ -32,7 +32,7 @@ df_alerts = df_health.join(df_equip, "equipment_id").withColumn(
 df_alerts.select(
     "equipment_id", "equipment_name", "status", "alert_message",
     "avg_vibration", "avg_temperature", "rul_hours", "created_at"
-).write.mode("append").saveAsTable("hg_demos.predictive_maintenance.maintenance_alerts")
+).write.mode("append").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_alerts")
 
 print(f"🔔 {df_alerts.count()}건의 정비 알림 생성 완료")
 display(df_alerts.select("alert_message"))

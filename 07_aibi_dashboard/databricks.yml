@@ -3,5 +3,5 @@ resources:
     pm_aibi_dashboard:
       display_name: "[${bundle.target}] PM - 장비 상태 AIBI 대시보드"
       file_path: ./pm_dashboard.lvdash.json
-      warehouse_id: "6898e1e8ebe84201"
+      warehouse_id: "86ec93a98d884cde"
       embed_credentials: true

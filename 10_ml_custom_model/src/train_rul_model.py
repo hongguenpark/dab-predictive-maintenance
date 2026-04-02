@@ -46,8 +46,8 @@ df = spark.sql("""
         COUNT(*) as reading_count,
         -- 시뮬레이션: 실제 RUL (타겟 변수)
         GREATEST(0, 10000 - e.operating_hours - AVG(s.vibration_rms) * 50 - GREATEST(AVG(s.temperature_c) - 50, 0) * 30 + (RAND() * 500 - 250)) as rul_hours
-    FROM hg_demos.predictive_maintenance.sensor_readings s
-    JOIN hg_demos.predictive_maintenance.equipment_master e ON s.equipment_id = e.equipment_id
+    FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s
+    JOIN ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e ON s.equipment_id = e.equipment_id
     GROUP BY s.equipment_id, e.operating_hours, e.criticality
 """)
 
@@ -104,7 +104,7 @@ with mlflow.start_run(run_name="rul_lightgbm_v1") as run:
     mlflow.sklearn.log_model(
         model,
         artifact_path="rul_model",
-        registered_model_name="hg_demos.predictive_maintenance.rul_prediction_model",
+        registered_model_name="ebay_anomaly_detection_catalog.predictive_maintenance.rul_prediction_model",
         input_example=X_train.head(1),
     )
 

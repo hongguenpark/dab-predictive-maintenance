@@ -27,5 +27,5 @@ for eq_id in equipment_ids:
 
 schema = "equipment_id STRING, timestamp TIMESTAMP, vibration_rms DOUBLE, temperature_c DOUBLE, pressure_bar DOUBLE, current_amp DOUBLE"
 df_new = spark.createDataFrame(records, schema)
-df_new.write.mode("append").saveAsTable("hg_demos.predictive_maintenance.sensor_readings")
+df_new.write.mode("append").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings")
 print(f"✅ {len(records)}건 센서 데이터 적재 완료 ({today})")

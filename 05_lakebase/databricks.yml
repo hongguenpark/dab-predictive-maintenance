@@ -1,0 +1,8 @@
+resources:
+  jobs:
+    deploy_lakebase:
+      name: "[${bundle.target}] PM - Lakebase 데이터베이스 배포"
+      tasks:
+        - task_key: setup_lakebase
+          notebook_task:
+            notebook_path: ./src/setup_lakebase.py

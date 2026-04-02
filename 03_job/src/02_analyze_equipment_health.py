@@ -7,7 +7,7 @@
 
 from pyspark.sql import functions as F
 
-df = spark.table("hg_demos.predictive_maintenance.sensor_readings")
+df = spark.table("ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings")
 
 # 최근 24시간 데이터만 필터링
 df_recent = df.filter(F.col("timestamp") >= F.date_sub(F.current_timestamp(), 1))
@@ -24,5 +24,5 @@ df_health = df_recent.groupBy("equipment_id").agg(
     F.current_timestamp().alias("analysis_timestamp")
 )
 
-df_health.write.mode("overwrite").saveAsTable("hg_demos.predictive_maintenance.equipment_health_daily")
+df_health.write.mode("overwrite").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.equipment_health_daily")
 display(df_health)

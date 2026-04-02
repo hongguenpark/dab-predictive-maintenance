@@ -20,7 +20,7 @@ headers = {
 base_url = f"https://{host}/api/2.0"
 
 GENIE_SPACE_TITLE = "PM - 예측 정비 장비 상태 조회"
-WAREHOUSE_ID = "6898e1e8ebe84201"
+WAREHOUSE_ID = "86ec93a98d884cde"
 
 print(f"워크스페이스: {host}")
 
@@ -33,11 +33,11 @@ print(f"워크스페이스: {host}")
 
 # 테이블/컬럼에 설명 추가 - Genie가 자연어 질의를 SQL로 변환할 때 참조
 spark.sql("""
-    COMMENT ON TABLE hg_demos.predictive_maintenance.equipment_master IS
+    COMMENT ON TABLE ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master IS
     '장비 마스터: equipment_id(장비ID), equipment_name(장비명), line(생산라인), criticality(중요도: 핵심/중요/보조), operating_hours(총운전시간)'
 """)
 spark.sql("""
-    COMMENT ON TABLE hg_demos.predictive_maintenance.sensor_readings IS
+    COMMENT ON TABLE ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings IS
     '센서측정: equipment_id(장비ID), timestamp(측정시각), vibration_rms(진동RMS-클수록위험), temperature_c(온도℃), pressure_bar(압력bar), current_amp(전류A)'
 """)
 print("✅ 테이블 코멘트 추가 완료")
@@ -50,7 +50,7 @@ print("✅ 테이블 코멘트 추가 완료")
 # COMMAND ----------
 
 spark.sql("""
-    CREATE OR REPLACE VIEW hg_demos.predictive_maintenance.genie_equipment_status
+    CREATE OR REPLACE VIEW ebay_anomaly_detection_catalog.predictive_maintenance.genie_equipment_status
     COMMENT '장비별 현재 상태 요약 뷰 - Genie 자연어 질의용. 장비ID, 장비명, 생산라인, 중요도, 운전시간, 평균진동, 평균온도, 평균압력, 상태(정상/주의/위험/긴급), 측정횟수'
     AS
     SELECT
@@ -69,13 +69,13 @@ spark.sql("""
             ELSE '정상'
         END AS `상태`,
         COUNT(*) AS `측정횟수`
-    FROM hg_demos.predictive_maintenance.equipment_master e
-    JOIN hg_demos.predictive_maintenance.sensor_readings s
+    FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e
+    JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s
         ON e.equipment_id = s.equipment_id
     GROUP BY ALL
 """)
 print("✅ genie_equipment_status 뷰 생성 완료")
-display(spark.table("hg_demos.predictive_maintenance.genie_equipment_status"))
+display(spark.table("ebay_anomaly_detection_catalog.predictive_maintenance.genie_equipment_status"))
 
 # COMMAND ----------
 
@@ -108,9 +108,9 @@ payload = {
     "description": "공장 설비 센서 데이터를 자연어로 질의하는 Genie Space (예측 정비 시나리오)",
     "warehouse_id": WAREHOUSE_ID,
     "table_identifiers": [
-        "hg_demos.predictive_maintenance.equipment_master",
-        "hg_demos.predictive_maintenance.sensor_readings",
-        "hg_demos.predictive_maintenance.genie_equipment_status"
+        "ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master",
+        "ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings",
+        "ebay_anomaly_detection_catalog.predictive_maintenance.genie_equipment_status"
     ],
     "instructions": "이 Genie Space는 공장 예측 정비 데이터를 분석합니다. 장비 상태 기준: 정상(진동≤4.5,온도≤60), 주의(진동>4.5 or 온도>60), 위험(진동>7 or 온도>75), 긴급(진동>10 or 온도>90). 항상 한국어로 답변하세요.",
     "curated_questions": [
@@ -159,11 +159,11 @@ else:
     print(f"   3. Databricks UI에서 위 테이블들을 선택하여 Genie Space 수동 생성 가능")
     print(f"\n   Genie Space 수동 생성 경로:")
     print(f"   Databricks > AI/BI > Genie > New Space")
-    print(f"   테이블: hg_demos.predictive_maintenance.equipment_master,")
-    print(f"           hg_demos.predictive_maintenance.sensor_readings,")
-    print(f"           hg_demos.predictive_maintenance.genie_equipment_status")
+    print(f"   테이블: ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master,")
+    print(f"           ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings,")
+    print(f"           ebay_anomaly_detection_catalog.predictive_maintenance.genie_equipment_status")
     dbutils.notebook.exit(json.dumps({
         "status": "partial_success",
         "message": "REST API 생성 실패, Genie 호환 뷰 및 테이블 코멘트 배포 완료",
-        "view": "hg_demos.predictive_maintenance.genie_equipment_status"
+        "view": "ebay_anomaly_detection_catalog.predictive_maintenance.genie_equipment_status"
     }))

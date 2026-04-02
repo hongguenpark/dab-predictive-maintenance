@@ -2,12 +2,12 @@ resources:
   pipelines:
     pm_dlt_pipeline:
       name: "[${bundle.target}] PM - 센서 데이터 DLT 파이프라인"
-      target: hg_demos.predictive_maintenance
-      catalog: hg_demos
+      target: ebay_anomaly_detection_catalog.predictive_maintenance
+      catalog: ebay_anomaly_detection_catalog
       libraries:
         - notebook:
             path: ./src/dlt_sensor_pipeline.py
       channel: PREVIEW
-      photon: true
+      serverless: true
       configuration:
-        source_schema: "hg_demos.predictive_maintenance"
+        source_schema: "ebay_anomaly_detection_catalog.predictive_maintenance"

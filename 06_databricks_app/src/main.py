@@ -32,10 +32,10 @@ def dashboard():
             SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours,
                    ROUND(AVG(s.vibration_rms), 2) as avg_vibration,
                    ROUND(AVG(s.temperature_c), 1) as avg_temp,
-                   hg_demos.predictive_maintenance.assess_vibration_status(
+                   ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(
                        AVG(s.vibration_rms), AVG(s.temperature_c)) as status
-            FROM hg_demos.predictive_maintenance.equipment_master e
-            JOIN hg_demos.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id
+            FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e
+            JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id
             GROUP BY ALL ORDER BY e.equipment_id
         """)
         rows = cursor.fetchall()
@@ -74,7 +74,7 @@ def dashboard():
 def get_equipment():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM hg_demos.predictive_maintenance.equipment_master")
+    cursor.execute("SELECT * FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master")
     cols = [d[0] for d in cursor.description]
     rows = [dict(zip(cols, row)) for row in cursor.fetchall()]
     cursor.close()

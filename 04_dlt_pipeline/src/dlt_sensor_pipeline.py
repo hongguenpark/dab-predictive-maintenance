@@ -23,7 +23,7 @@ from pyspark.sql import functions as F
 )
 def sensor_raw_bronze():
     return (
-        spark.table("hg_demos.predictive_maintenance.sensor_readings")
+        spark.table("ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings")
         .withColumn("ingestion_timestamp", F.current_timestamp())
         .withColumn("source", F.lit("iot_gateway"))
     )
