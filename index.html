@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databricks Asset Bundles (DAB) 기능별 배포 테스트 결과</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header {
+            background: linear-gradient(135deg, #FF3621 0%, #E2231A 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(255, 54, 33, 0.3);
+        }
+        header h1 { font-size: 28px; margin-bottom: 8px; }
+        header p { opacity: 0.9; font-size: 16px; }
+        .meta-info {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            font-size: 14px;
+            opacity: 0.85;
+        }
+        .meta-info span { display: flex; align-items: center; gap: 6px; }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .card .number { font-size: 36px; font-weight: 700; }
+        .card .label { font-size: 14px; color: #718096; margin-top: 4px; }
+        .card.green .number { color: #22c55e; }
+        .card.yellow .number { color: #eab308; }
+        .card.red .number { color: #ef4444; }
+        .card.blue .number { color: #3b82f6; }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
+        th {
+            background: #1e293b;
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f7fafc; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-yes { background: #dcfce7; color: #166534; }
+        .badge-partial { background: #fef9c3; color: #854d0e; }
+        .badge-no { background: #fee2e2; color: #991b1b; }
+
+        .link-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e2e8f0;
+            color: #475569;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            margin: 2px 0;
+            transition: all 0.2s;
+        }
+        .link-btn:hover { background: #FF3621; color: white; }
+        .link-btn.github { background: #1e293b; color: white; }
+        .link-btn.github:hover { background: #334155; }
+        .link-btn.databricks { background: #FF3621; color: white; }
+        .link-btn.databricks:hover { background: #E2231A; }
+
+        .notes { font-size: 13px; color: #64748b; line-height: 1.5; }
+        .notes strong { color: #334155; }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-cards { grid-template-columns: repeat(2, 1fr); }
+            table { font-size: 12px; }
+            td, th { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Databricks Asset Bundles (DAB) 기능별 배포 테스트 결과</h1>
+            <p>예측 정비 (Predictive Maintenance) 시나리오 기반 - 13개 Databricks 기능 DAB 배포 검증</p>
+            <div class="meta-info">
+                <span>📅 테스트 일시: 2026-04-02</span>
+                <span>🏢 워크스페이스: e2-demo-field-eng</span>
+                <span>📦 카탈로그: hg_demos</span>
+                <span>👤 테스터: Honggeun Park</span>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card green">
+                <div class="number">8</div>
+                <div class="label">DAB 직접 배포 가능</div>
+            </div>
+            <div class="card yellow">
+                <div class="number">2</div>
+                <div class="label">간접 배포 (Job 경유)</div>
+            </div>
+            <div class="card red">
+                <div class="number">3</div>
+                <div class="label">DAB 미지원</div>
+            </div>
+            <div class="card blue">
+                <div class="number">13</div>
+                <div class="label">총 테스트 기능</div>
+            </div>
+        </div>
+
+        <div class="section-title">📊 기능별 상세 결과</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:5%">#</th>
+                    <th style="width:15%">기능</th>
+                    <th style="width:10%">DAB 배포 가능 여부</th>
+                    <th style="width:12%">DAB 리소스 타입</th>
+                    <th style="width:15%">샘플 코드 (GitHub)</th>
+                    <th style="width:15%">배포된 리소스 (Databricks)</th>
+                    <th style="width:28%">주요 사항</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 1. Unity Catalog Function -->
+                <tr>
+                    <td>1</td>
+                    <td><strong>Unity Catalog Function</strong></td>
+                    <td><span class="badge badge-partial">간접 지원</span></td>
+                    <td><code>schemas</code> + <code>jobs</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/01_unity_catalog_function" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/905521492805709?o=1444828305810485" class="link-btn databricks" target="_blank">🔧 Job</a>
+                    </td>
+                    <td class="notes">
+                        <strong>UC Function 자체는 DAB 리소스 타입이 아님.</strong>
+                        Schema는 DAB로 관리 가능하나, 함수 생성은 SQL 노트북을 Job으로 실행하여 배포.
+                        3개 함수 구현: 진동 상태 판별, RUL 추정, 정비 우선순위 점수
+                    </td>
+                </tr>
+
+                <!-- 2. Notebook -->
+                <tr>
+                    <td>2</td>
+                    <td><strong>Notebook</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>jobs</code> (notebook_task)</td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/02_notebook" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/499642927724687?o=1444828305810485" class="link-btn databricks" target="_blank">📓 EDA Job</a>
+                    </td>
+                    <td class="notes">
+                        노트북은 DAB의 <code>sync</code>를 통해 워크스페이스에 자동 업로드됨.
+                        Job의 <code>notebook_task</code>로 실행 가능.
+                        EDA 노트북: 센서 데이터 생성, 통계 분석, 이상 탐지
+                    </td>
+                </tr>
+
+                <!-- 3. Job -->
+                <tr>
+                    <td>3</td>
+                    <td><strong>Job (Workflow)</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>jobs</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/03_job" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/863245878989382?o=1444828305810485" class="link-btn databricks" target="_blank">⚙️ 일일 분석 Job</a>
+                    </td>
+                    <td class="notes">
+                        <strong>DAB의 핵심 리소스.</strong>
+                        멀티태스크 Job 지원 (의존성 포함).
+                        스케줄(cron), 알림, 클러스터 설정 모두 YAML로 관리.
+                        3단계 파이프라인: 데이터 수집 → 분석 → 알림 생성
+                    </td>
+                </tr>
+
+                <!-- 4. DLT Pipeline -->
+                <tr>
+                    <td>4</td>
+                    <td><strong>DLT Pipeline<br>(Lakeflow)</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>pipelines</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/04_dlt_pipeline" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/pipelines/37551651-a53f-49da-81f2-ab252d751929?o=1444828305810485" class="link-btn databricks" target="_blank">🔄 DLT Pipeline</a>
+                    </td>
+                    <td class="notes">
+                        <strong>Medallion 아키텍처 완벽 구현.</strong>
+                        <code>pipelines</code> 리소스로 직접 선언. Unity Catalog 통합 지원.
+                        DLT Expectations로 데이터 품질 검증 포함.
+                        Bronze(원시) → Silver(정제) → Gold(집계) 3단계
+                    </td>
+                </tr>
+
+                <!-- 5. Lakebase -->
+                <tr>
+                    <td>5</td>
+                    <td><strong>Lakebase</strong></td>
+                    <td><span class="badge badge-no">❌ 미지원</span></td>
+                    <td>해당 없음</td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/05_lakebase" class="link-btn github" target="_blank">📁 README</a>
+                    </td>
+                    <td>-</td>
+                    <td class="notes">
+                        <strong>DAB 리소스 타입 없음.</strong>
+                        Lakebase(관리형 PostgreSQL)는 REST API 또는 SDK로만 프로비저닝 가능.
+                        <strong>대안:</strong> App 내에서 Lakebase SDK 사용, 또는 노트북에서 API 호출
+                    </td>
+                </tr>
+
+                <!-- 6. Databricks App -->
+                <tr>
+                    <td>6</td>
+                    <td><strong>Databricks App</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>apps</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/06_databricks_app" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <span class="badge badge-partial">워크스페이스 제한(300개)</span>
+                    </td>
+                    <td class="notes">
+                        <strong><code>apps</code> 리소스로 직접 배포 가능.</strong>
+                        source_code_path로 소스 동기화, resources로 SQL Warehouse/Secret 바인딩.
+                        ⚠️ 이 워크스페이스는 App 300개 제한에 도달하여 실제 배포 불가.
+                        FastAPI 대시보드 구현 (장비 상태 모니터링)
+                    </td>
+                </tr>
+
+                <!-- 7. AI/BI Dashboard -->
+                <tr>
+                    <td>7</td>
+                    <td><strong>AI/BI Dashboard</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>dashboards</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/07_aibi_dashboard" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/dashboardsv3/01f12e354109171585bc5f5a010e41c1/published?o=1444828305810485" class="link-btn databricks" target="_blank">📊 Dashboard</a>
+                    </td>
+                    <td class="notes">
+                        <strong><code>dashboards</code> 리소스로 직접 배포.</strong>
+                        Lakeview JSON 형식으로 대시보드 정의.
+                        <code>databricks bundle generate dashboard</code>로 기존 대시보드 export 가능.
+                        장비 상태 테이블, 상태 분포 차트, 진동 추이 라인차트 포함
+                    </td>
+                </tr>
+
+                <!-- 8. Genie -->
+                <tr>
+                    <td>8</td>
+                    <td><strong>Genie</strong></td>
+                    <td><span class="badge badge-no">❌ 미지원</span></td>
+                    <td>해당 없음</td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/08_genie" class="link-btn github" target="_blank">📁 README</a>
+                    </td>
+                    <td>-</td>
+                    <td class="notes">
+                        <strong>DAB 리소스 타입 없음.</strong>
+                        Genie Space는 REST API(<code>/api/2.0/genie/spaces</code>)로만 생성 가능.
+                        <strong>대안:</strong> AI/BI Dashboard에 Genie 기능이 통합되어 있으므로 Dashboard 배포로 대체 가능
+                    </td>
+                </tr>
+
+                <!-- 9. Metric View -->
+                <tr>
+                    <td>9</td>
+                    <td><strong>Metric View</strong></td>
+                    <td><span class="badge badge-partial">간접 지원</span></td>
+                    <td><code>jobs</code> (SQL notebook)</td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/09_metric_view" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/1115992940865922?o=1444828305810485" class="link-btn databricks" target="_blank">📐 Metric View Job</a>
+                    </td>
+                    <td class="notes">
+                        <strong>Metric View 자체는 DAB 리소스 타입이 아님.</strong>
+                        SQL 노트북으로 CREATE VIEW 문을 실행하여 배포.
+                        OEE(종합설비효율), MTBF(평균고장간격), 가동률 메트릭 구현
+                    </td>
+                </tr>
+
+                <!-- 10. ML Custom Model -->
+                <tr>
+                    <td>10</td>
+                    <td><strong>ML Custom Model</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>experiments</code> + <code>registered_models</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/10_ml_custom_model" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/ml/experiments/3323959017477378?o=1444828305810485" class="link-btn databricks" target="_blank">🧪 Experiment</a>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/explore/data/models/hg_demos/predictive_maintenance/dev_hongguen_park_rul_prediction_model?o=1444828305810485" class="link-btn databricks" target="_blank">🤖 Model</a>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/711612701404901?o=1444828305810485" class="link-btn databricks" target="_blank">📈 Training Job</a>
+                    </td>
+                    <td class="notes">
+                        <strong>Experiment + Registered Model + 학습 Job을 모두 DAB로 관리.</strong>
+                        MLflow 실험 추적과 UC 모델 레지스트리 연동.
+                        LightGBM 기반 RUL(잔여수명) 예측 모델.
+                        Feature: 진동, 온도, 압력, 전류, 운전시간
+                    </td>
+                </tr>
+
+                <!-- 11. Model Serving -->
+                <tr>
+                    <td>11</td>
+                    <td><strong>Model Serving</strong></td>
+                    <td><span class="badge badge-yes">✅ 지원</span></td>
+                    <td><code>model_serving_endpoints</code></td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/11_model_serving" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <span class="badge badge-partial">모델 학습 후 배포 가능</span>
+                    </td>
+                    <td class="notes">
+                        <strong><code>model_serving_endpoints</code>로 직접 배포 가능.</strong>
+                        served_entities로 모델 버전 지정, scale_to_zero 설정 가능.
+                        AI Gateway inference table로 추론 로그 자동 수집.
+                        ⚠️ 모델이 먼저 등록되어야 endpoint 생성 가능
+                    </td>
+                </tr>
+
+                <!-- 12. Knowledge Assistant -->
+                <tr>
+                    <td>12</td>
+                    <td><strong>AgentBricks<br>Knowledge Assistant</strong></td>
+                    <td><span class="badge badge-no">❌ 미지원</span></td>
+                    <td>해당 없음</td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/12_agent_knowledge_assistant" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/1053740522185498?o=1444828305810485" class="link-btn databricks" target="_blank">📚 KB 설정 Job</a>
+                    </td>
+                    <td class="notes">
+                        <strong>AgentBricks Knowledge Assistant는 DAB 리소스 타입 없음.</strong>
+                        UI에서만 생성 가능 (AI/BI > AgentBricks).
+                        <strong>대안:</strong> DAB Job으로 지식 베이스 데이터 + Vector Search 인덱스 준비 후 UI에서 연결.
+                        8개 정비 매뉴얼 문서 준비 완료
+                    </td>
+                </tr>
+
+                <!-- 13. Supervisor Agent -->
+                <tr>
+                    <td>13</td>
+                    <td><strong>AgentBricks<br>Supervisor Agent</strong></td>
+                    <td><span class="badge badge-no">❌ 미지원</span></td>
+                    <td>해당 없음</td>
+                    <td>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/13_agent_supervisor" class="link-btn github" target="_blank">📁 GitHub</a>
+                    </td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/1110322576030748?o=1444828305810485" class="link-btn databricks" target="_blank">🤖 Agent 설정 Job</a>
+                    </td>
+                    <td class="notes">
+                        <strong>AgentBricks Supervisor Agent는 DAB 리소스 타입 없음.</strong>
+                        UI에서만 생성 가능.
+                        <strong>대안:</strong> Mosaic AI Agent Framework + MLflow로 코드 기반 에이전트 개발 후 <code>model_serving_endpoints</code>로 배포.
+                        3개 Sub-Agent 설계: 지식검색, 데이터분석, RUL예측
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">📋 요약</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>분류</th>
+                    <th>기능 목록</th>
+                    <th>DAB 리소스 타입</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge badge-yes">직접 배포 가능 (8개)</span></td>
+                    <td>Notebook, Job, DLT Pipeline, Databricks App, AI/BI Dashboard, ML Experiment, Registered Model, Model Serving</td>
+                    <td><code>jobs</code>, <code>pipelines</code>, <code>apps</code>, <code>dashboards</code>, <code>experiments</code>, <code>registered_models</code>, <code>model_serving_endpoints</code></td>
+                    <td>YAML 선언으로 완전 자동화 배포 가능</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-partial">간접 배포 (2개)</span></td>
+                    <td>Unity Catalog Function, Metric View</td>
+                    <td><code>jobs</code> (notebook_task) + <code>schemas</code></td>
+                    <td>SQL 노트북을 Job으로 실행하여 배포. Schema는 직접 관리 가능</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-no">미지원 (3개)</span></td>
+                    <td>Lakebase, Genie, AgentBricks (Knowledge Assistant, Supervisor Agent)</td>
+                    <td>해당 없음</td>
+                    <td>REST API 또는 UI에서만 관리 가능. DAB Job에서 API 호출로 자동화 가능</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">🏭 예측 정비 (Predictive Maintenance) 시나리오 개요</div>
+
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 30px;">
+            <h3 style="margin-bottom: 16px; color: #1e293b;">시나리오 설명</h3>
+            <p style="margin-bottom: 16px; color: #475569;">
+                공장의 8대 핵심 설비(CNC 선반, 프레스기, 컨베이어, 로봇암, 펌프, 압축기, 냉각기, 보일러)에서
+                IoT 센서(진동, 온도, 압력, 전류)로 실시간 데이터를 수집하여 설비 상태를 모니터링하고,
+                ML 모델로 잔여 수명(RUL)을 예측하여 사전 정비를 수행하는 시나리오입니다.
+            </p>
+
+            <h3 style="margin-bottom: 12px; color: #1e293b;">데이터 흐름</h3>
+            <div style="background: #f8fafc; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 13px; line-height: 2;">
+                <span style="color: #FF3621;">IoT 센서</span> →
+                <span style="color: #3b82f6;">DLT Pipeline (Bronze→Silver→Gold)</span> →
+                <span style="color: #8b5cf6;">일일 분석 Job</span> →
+                <span style="color: #22c55e;">ML 모델 학습/추론</span> →
+                <span style="color: #f97316;">AI/BI Dashboard + 알림</span>
+                <br>
+                <span style="color: #FF3621;">정비 매뉴얼</span> →
+                <span style="color: #3b82f6;">Vector Search</span> →
+                <span style="color: #8b5cf6;">Knowledge Assistant</span> →
+                <span style="color: #22c55e;">Supervisor Agent</span>
+            </div>
+
+            <h3 style="margin: 16px 0 12px; color: #1e293b;">주요 UC Functions</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li style="padding: 4px 0; color: #475569;">🔹 <code>assess_vibration_status()</code> - 진동/온도 기반 장비 상태 판별 (정상/주의/위험/긴급)</li>
+                <li style="padding: 4px 0; color: #475569;">🔹 <code>estimate_rul()</code> - 잔여 유효 수명 추정 (시간 단위)</li>
+                <li style="padding: 4px 0; color: #475569;">🔹 <code>maintenance_priority_score()</code> - 정비 우선순위 점수 (0~100)</li>
+            </ul>
+        </div>
+
+        <div class="section-title">🔗 관련 링크</div>
+        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 30px;">
+            <p>
+                <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance" class="link-btn github" target="_blank" style="font-size: 14px; padding: 8px 16px;">
+                    GitHub Repository
+                </a>
+                <a href="https://e2-demo-field-eng.cloud.databricks.com" class="link-btn databricks" target="_blank" style="font-size: 14px; padding: 8px 16px;">
+                    Databricks Workspace
+                </a>
+                <a href="https://docs.databricks.com/dev-tools/bundles/index.html" class="link-btn" target="_blank" style="font-size: 14px; padding: 8px 16px;">
+                    DAB 공식 문서
+                </a>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>Generated by Databricks Asset Bundles Feature Test | Honggeun Park | 2026-04-02</p>
+        </div>
+    </div>
+</body>
+</html>

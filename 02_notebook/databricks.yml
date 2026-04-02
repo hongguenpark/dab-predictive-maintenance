@@ -1,0 +1,8 @@
+resources:
+  jobs:
+    pm_eda_notebook:
+      name: "[${bundle.target}] PM - 탐색적 데이터 분석 노트북"
+      tasks:
+        - task_key: run_eda
+          notebook_task:
+            notebook_path: ./src/predictive_maintenance_eda.py

@@ -1,0 +1,8 @@
+resources:
+  jobs:
+    deploy_knowledge_assistant:
+      name: "[${bundle.target}] PM - Knowledge Assistant 배포"
+      tasks:
+        - task_key: setup_knowledge_base
+          notebook_task:
+            notebook_path: ./src/setup_knowledge_assistant.py

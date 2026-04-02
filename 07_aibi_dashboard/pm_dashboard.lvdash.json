@@ -1,0 +1,103 @@
+{
+  "pages": [
+    {
+      "name": "equipment_overview",
+      "displayName": "장비 상태 개요",
+      "layout": [
+        {
+          "widget": {
+            "name": "equipment_status_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "equipment_status",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {"fieldName": "equipment_id", "displayName": "장비 ID"},
+                  {"fieldName": "equipment_name", "displayName": "장비명"},
+                  {"fieldName": "status", "displayName": "상태"},
+                  {"fieldName": "avg_vibration", "displayName": "평균 진동"},
+                  {"fieldName": "avg_temperature", "displayName": "평균 온도"},
+                  {"fieldName": "rul_hours", "displayName": "잔여 수명(h)"}
+                ]
+              }
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 4}
+        },
+        {
+          "widget": {
+            "name": "status_distribution",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "status_counts",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "status", "displayName": "상태"},
+                "y": {"fieldName": "count", "displayName": "장비 수"}
+              }
+            }
+          },
+          "position": {"x": 0, "y": 4, "width": 3, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "vibration_trend",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "vibration_trend",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {"fieldName": "date", "displayName": "날짜"},
+                "y": {"fieldName": "avg_vibration", "displayName": "평균 진동"},
+                "color": {"fieldName": "equipment_id", "displayName": "장비"}
+              }
+            }
+          },
+          "position": {"x": 3, "y": 4, "width": 3, "height": 3}
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "name": "equipment_status",
+      "displayName": "장비 상태",
+      "query": "SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, hg_demos.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status, ROUND(hg_demos.predictive_maintenance.estimate_rul(e.operating_hours, AVG(s.vibration_rms), AVG(s.temperature_c)), 0) as rul_hours FROM hg_demos.predictive_maintenance.equipment_master e JOIN hg_demos.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY rul_hours ASC"
+    },
+    {
+      "name": "status_counts",
+      "displayName": "상태별 장비 수",
+      "query": "WITH eq_status AS (SELECT e.equipment_id, hg_demos.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status FROM hg_demos.predictive_maintenance.equipment_master e JOIN hg_demos.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as count FROM eq_status GROUP BY status"
+    },
+    {
+      "name": "vibration_trend",
+      "displayName": "진동 추이",
+      "query": "SELECT equipment_id, DATE(timestamp) as date, ROUND(AVG(vibration_rms), 2) as avg_vibration FROM hg_demos.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY date"
+    }
+  ]
+}

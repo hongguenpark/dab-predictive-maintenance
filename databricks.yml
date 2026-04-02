@@ -1,0 +1,32 @@
+bundle:
+  name: predictive-maintenance
+
+workspace:
+  host: https://e2-demo-field-eng.cloud.databricks.com
+  profile: e2-demo-fe
+
+include:
+  - "01_unity_catalog_function/databricks.yml"
+  - "02_notebook/databricks.yml"
+  - "03_job/databricks.yml"
+  - "04_dlt_pipeline/databricks.yml"
+  # App은 워크스페이스 300개 제한으로 별도 배포 필요
+  # - "06_databricks_app/databricks.yml"
+  - "07_aibi_dashboard/databricks.yml"
+  - "09_metric_view/databricks.yml"
+  - "10_ml_custom_model/databricks.yml"
+  # Model Serving은 모델 등록 후 별도 배포
+  # - "11_model_serving/databricks.yml"
+  - "12_agent_knowledge_assistant/databricks.yml"
+  - "13_agent_supervisor/databricks.yml"
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: /Users/hongguen.park@databricks.com/.bundle/${bundle.name}/${bundle.target}
+  prod:
+    mode: production
+    workspace:
+      root_path: /Shared/.bundle/${bundle.name}/${bundle.target}

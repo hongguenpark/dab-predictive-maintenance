@@ -1,0 +1,18 @@
+resources:
+  experiments:
+    pm_ml_experiment:
+      name: "/Users/hongguen.park@databricks.com/predictive_maintenance_rul"
+
+  registered_models:
+    pm_rul_model:
+      name: rul_prediction_model
+      catalog_name: hg_demos
+      schema_name: predictive_maintenance
+
+  jobs:
+    pm_model_training:
+      name: "[${bundle.target}] PM - ML 모델 학습"
+      tasks:
+        - task_key: train_rul_model
+          notebook_task:
+            notebook_path: ./src/train_rul_model.py

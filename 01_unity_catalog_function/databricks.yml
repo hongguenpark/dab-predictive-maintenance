@@ -1,0 +1,14 @@
+resources:
+  schemas:
+    predictive_maintenance:
+      catalog_name: hg_demos
+      name: predictive_maintenance
+      comment: "예측 정비 (Predictive Maintenance) 데모 스키마"
+
+  jobs:
+    deploy_uc_functions:
+      name: "[${bundle.target}] PM - UC 함수 배포"
+      tasks:
+        - task_key: create_functions
+          notebook_task:
+            notebook_path: ./src/create_functions.sql

@@ -1,0 +1,13 @@
+resources:
+  pipelines:
+    pm_dlt_pipeline:
+      name: "[${bundle.target}] PM - 센서 데이터 DLT 파이프라인"
+      target: hg_demos.predictive_maintenance
+      catalog: hg_demos
+      libraries:
+        - notebook:
+            path: ./src/dlt_sensor_pipeline.py
+      channel: PREVIEW
+      photon: true
+      configuration:
+        source_schema: "hg_demos.predictive_maintenance"

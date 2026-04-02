@@ -1,0 +1,8 @@
+resources:
+  jobs:
+    deploy_supervisor_agent:
+      name: "[${bundle.target}] PM - Supervisor Agent 배포"
+      tasks:
+        - task_key: setup_supervisor_agent
+          notebook_task:
+            notebook_path: ./src/setup_supervisor_agent.py

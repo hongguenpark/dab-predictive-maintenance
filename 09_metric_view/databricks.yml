@@ -1,0 +1,8 @@
+resources:
+  jobs:
+    deploy_metric_views:
+      name: "[${bundle.target}] PM - Metric View 배포"
+      tasks:
+        - task_key: create_metric_views
+          notebook_task:
+            notebook_path: ./src/create_metric_views.sql
