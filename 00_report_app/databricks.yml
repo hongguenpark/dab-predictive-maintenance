@@ -1,0 +1,6 @@
+resources:
+  apps:
+    pm_report_app:
+      name: "pm-dab-test-report-hg"
+      description: "DAB 기능별 배포 테스트 결과 보고서"
+      source_code_path: ./src

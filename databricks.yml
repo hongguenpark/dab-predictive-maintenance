@@ -6,6 +6,7 @@ workspace:
   profile: fe-vm-ebay-anomaly-detection
 
 include:
+  - "00_report_app/databricks.yml"
   - "01_unity_catalog_function/databricks.yml"
   - "02_notebook/databricks.yml"
   - "03_job/databricks.yml"
