@@ -1,10 +1,31 @@
 {
   "datasets": [
     {
-      "name": "ds_equipment_status",
-      "displayName": "장비 상태 종합",
+      "name": "ds_kpi_total",
+      "displayName": "KPI 총장비",
       "queryLines": [
-        "SELECT e.equipment_id, e.equipment_name, e.line, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(MAX(s.vibration_rms), 2) as max_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, ROUND(MAX(s.temperature_c), 1) as max_temperature, ROUND(AVG(s.pressure_bar), 1) as avg_pressure, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status, COUNT(*) as reading_count FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY avg_vibration DESC"
+        "SELECT COUNT(DISTINCT equipment_id) as total FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master"
+      ]
+    },
+    {
+      "name": "ds_kpi_alert",
+      "displayName": "KPI 위험장비",
+      "queryLines": [
+        "SELECT COUNT(*) as alert_cnt FROM (SELECT e.equipment_id FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id HAVING AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75)"
+      ]
+    },
+    {
+      "name": "ds_kpi_vib",
+      "displayName": "KPI 평균진동",
+      "queryLines": [
+        "SELECT ROUND(AVG(vibration_rms), 2) as avg_vib FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings"
+      ]
+    },
+    {
+      "name": "ds_kpi_temp",
+      "displayName": "KPI 평균온도",
+      "queryLines": [
+        "SELECT ROUND(AVG(temperature_c), 1) as avg_temp FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings"
       ]
     },
     {
@@ -12,20 +33,6 @@
       "displayName": "상태별 장비 수",
       "queryLines": [
         "WITH eq AS (SELECT e.equipment_id, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as cnt FROM eq GROUP BY status"
-      ]
-    },
-    {
-      "name": "ds_vibration_trend",
-      "displayName": "진동 추이",
-      "queryLines": [
-        "SELECT equipment_id, DATE(timestamp) as dt, ROUND(AVG(vibration_rms), 2) as avg_vib FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
-      ]
-    },
-    {
-      "name": "ds_temp_trend",
-      "displayName": "온도 추이",
-      "queryLines": [
-        "SELECT equipment_id, DATE(timestamp) as dt, ROUND(AVG(temperature_c), 1) as avg_temp FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
       ]
     },
     {
@@ -43,17 +50,24 @@
       ]
     },
     {
-      "name": "ds_kpi_total",
-      "displayName": "KPI 총장비",
+      "name": "ds_equipment_status",
+      "displayName": "장비 상태 종합",
       "queryLines": [
-        "SELECT COUNT(DISTINCT equipment_id) as total FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master"
+        "SELECT e.equipment_id, e.equipment_name, e.line, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(MAX(s.vibration_rms), 2) as max_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, ROUND(MAX(s.temperature_c), 1) as max_temperature, ROUND(AVG(s.pressure_bar), 1) as avg_pressure, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status, COUNT(*) as reading_count FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY avg_vibration DESC"
       ]
     },
     {
-      "name": "ds_kpi_alert",
-      "displayName": "KPI 위험장비",
+      "name": "ds_vibration_trend",
+      "displayName": "진동 추이",
       "queryLines": [
-        "SELECT COUNT(*) as alert_cnt FROM (SELECT e.equipment_id FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id HAVING AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75)"
+        "SELECT equipment_id, DATE(timestamp) as dt, ROUND(AVG(vibration_rms), 2) as avg_vib FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
+      ]
+    },
+    {
+      "name": "ds_temp_trend",
+      "displayName": "온도 추이",
+      "queryLines": [
+        "SELECT equipment_id, DATE(timestamp) as dt, ROUND(AVG(temperature_c), 1) as avg_temp FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings GROUP BY equipment_id, DATE(timestamp) ORDER BY dt"
       ]
     },
     {
@@ -108,7 +122,7 @@
           "position": {
             "x": 0,
             "y": 0,
-            "width": 1,
+            "width": 3,
             "height": 2
           }
         },
@@ -142,9 +156,81 @@
             }
           },
           "position": {
-            "x": 1,
+            "x": 3,
             "y": 0,
-            "width": 1,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "w_kpi_vib",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_kpi_vib",
+                  "fields": [
+                    {
+                      "name": "avg_vib",
+                      "expression": "`avg_vib`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_vib",
+                  "displayName": "전체 평균 진동 (RMS)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "w_kpi_temp",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_kpi_temp",
+                  "fields": [
+                    {
+                      "name": "avg_temp",
+                      "expression": "`avg_temp`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_temp",
+                  "displayName": "전체 평균 온도 (℃)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
             "height": 2
           }
         },
@@ -186,9 +272,9 @@
             }
           },
           "position": {
-            "x": 2,
-            "y": 0,
-            "width": 2,
+            "x": 0,
+            "y": 2,
+            "width": 4,
             "height": 4
           }
         },
@@ -227,7 +313,7 @@
                 },
                 "y": {
                   "fieldName": "avg_vibration",
-                  "displayName": "평균 진동",
+                  "displayName": "평균 진동 (RMS)",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -237,8 +323,8 @@
           },
           "position": {
             "x": 4,
-            "y": 0,
-            "width": 2,
+            "y": 2,
+            "width": 4,
             "height": 4
           }
         },
@@ -277,7 +363,7 @@
                 },
                 "y": {
                   "fieldName": "avg_temperature",
-                  "displayName": "평균 온도",
+                  "displayName": "평균 온도 (℃)",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -286,9 +372,9 @@
             }
           },
           "position": {
-            "x": 0,
+            "x": 8,
             "y": 2,
-            "width": 2,
+            "width": 4,
             "height": 4
           }
         },
@@ -361,7 +447,7 @@
                 "columns": [
                   {
                     "fieldName": "equipment_id",
-                    "displayName": "장비ID"
+                    "displayName": "장비 ID"
                   },
                   {
                     "fieldName": "equipment_name",
@@ -369,7 +455,7 @@
                   },
                   {
                     "fieldName": "line",
-                    "displayName": "라인"
+                    "displayName": "생산 라인"
                   },
                   {
                     "fieldName": "criticality",
@@ -381,31 +467,31 @@
                   },
                   {
                     "fieldName": "operating_hours",
-                    "displayName": "운전시간"
+                    "displayName": "운전시간 (h)"
                   },
                   {
                     "fieldName": "avg_vibration",
-                    "displayName": "진동(평균)"
+                    "displayName": "평균 진동"
                   },
                   {
                     "fieldName": "max_vibration",
-                    "displayName": "진동(최대)"
+                    "displayName": "최대 진동"
                   },
                   {
                     "fieldName": "avg_temperature",
-                    "displayName": "온도(평균)"
+                    "displayName": "평균 온도"
                   },
                   {
                     "fieldName": "max_temperature",
-                    "displayName": "온도(최대)"
+                    "displayName": "최대 온도"
                   },
                   {
                     "fieldName": "avg_pressure",
-                    "displayName": "압력"
+                    "displayName": "평균 압력"
                   },
                   {
                     "fieldName": "reading_count",
-                    "displayName": "측정수"
+                    "displayName": "측정 건수"
                   }
                 ]
               }
@@ -414,8 +500,8 @@
           "position": {
             "x": 0,
             "y": 6,
-            "width": 6,
-            "height": 5
+            "width": 12,
+            "height": 6
           }
         }
       ],
