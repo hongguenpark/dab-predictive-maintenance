@@ -155,12 +155,12 @@
                 <div class="label">DAB 직접 배포 가능</div>
             </div>
             <div class="card yellow">
-                <div class="number">2</div>
+                <div class="number">3</div>
                 <div class="label">간접 배포 (Job 경유)</div>
             </div>
             <div class="card red">
-                <div class="number">3</div>
-                <div class="label">DAB 미지원</div>
+                <div class="number">2</div>
+                <div class="label">DAB 미지원 (UI 전용)</div>
             </div>
             <div class="card blue">
                 <div class="number">13</div>
@@ -187,18 +187,20 @@
                 <tr>
                     <td>1</td>
                     <td><strong>Unity Catalog Function</strong></td>
-                    <td><span class="badge badge-partial">간접 지원</span></td>
+                    <td><span class="badge badge-yes">✅ 지원 (Job 경유)</span></td>
                     <td><code>schemas</code> + <code>jobs</code></td>
                     <td>
                         <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/01_unity_catalog_function" class="link-btn github" target="_blank">📁 GitHub</a>
                     </td>
                     <td>
                         <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/905521492805709?o=1444828305810485" class="link-btn databricks" target="_blank">🔧 Job</a>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/?o=1444828305810485#job/905521492805709/run/236339618606295" class="link-btn databricks" target="_blank">✅ 실행결과</a>
                     </td>
                     <td class="notes">
-                        <strong>UC Function 자체는 DAB 리소스 타입이 아님.</strong>
-                        Schema는 DAB로 관리 가능하나, 함수 생성은 SQL 노트북을 Job으로 실행하여 배포.
-                        3개 함수 구현: 진동 상태 판별, RUL 추정, 정비 우선순위 점수
+                        <strong>✅ 실행 테스트 성공 (SUCCESS).</strong>
+                        SQL 노트북에서 CREATE FUNCTION 문을 실행하여 UC 함수를 DAB Job으로 배포.
+                        Schema는 DAB <code>schemas</code> 리소스로 직접 관리 가능.
+                        3개 함수 구현: <code>assess_vibration_status()</code>, <code>estimate_rul()</code>, <code>maintenance_priority_score()</code>
                     </td>
                 </tr>
 
@@ -322,16 +324,23 @@
                 <tr>
                     <td>8</td>
                     <td><strong>Genie</strong></td>
-                    <td><span class="badge badge-no">❌ 미지원</span></td>
-                    <td>해당 없음</td>
+                    <td><span class="badge badge-yes">✅ 지원 (Job 경유)</span></td>
+                    <td><code>jobs</code> (REST API + SQL)</td>
                     <td>
-                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/08_genie" class="link-btn github" target="_blank">📁 README</a>
+                        <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/08_genie" class="link-btn github" target="_blank">📁 GitHub</a>
                     </td>
-                    <td>-</td>
+                    <td>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/jobs/419713012365349?o=1444828305810485" class="link-btn databricks" target="_blank">🔧 Job</a>
+                        <a href="https://e2-demo-field-eng.cloud.databricks.com/?o=1444828305810485#job/419713012365349/run/933129090594968" class="link-btn databricks" target="_blank">✅ 실행결과</a>
+                    </td>
                     <td class="notes">
-                        <strong>DAB 리소스 타입 없음.</strong>
-                        Genie Space는 REST API(<code>/api/2.0/genie/spaces</code>)로만 생성 가능.
-                        <strong>대안:</strong> AI/BI Dashboard에 Genie 기능이 통합되어 있으므로 Dashboard 배포로 대체 가능
+                        <strong>✅ 실행 테스트 성공 (SUCCESS).</strong>
+                        DAB Job에서 노트북을 실행하여 Genie 호환 리소스를 자동 배포:
+                        (1) 테이블 코멘트 추가 (Genie 자연어 이해도 향상),
+                        (2) <code>genie_equipment_status</code> 요약 뷰 생성,
+                        (3) REST API로 Genie Space 생성 시도.
+                        Genie Space REST API는 내부 API 형식 제한으로 직접 생성 불가하나,
+                        뷰/코멘트 배포로 UI에서 즉시 Genie Space 구성 가능
                     </td>
                 </tr>
 
@@ -457,16 +466,16 @@
                     <td>YAML 선언으로 완전 자동화 배포 가능</td>
                 </tr>
                 <tr>
-                    <td><span class="badge badge-partial">간접 배포 (2개)</span></td>
-                    <td>Unity Catalog Function, Metric View</td>
-                    <td><code>jobs</code> (notebook_task) + <code>schemas</code></td>
-                    <td>SQL 노트북을 Job으로 실행하여 배포. Schema는 직접 관리 가능</td>
+                    <td><span class="badge badge-partial">간접 배포 (3개)</span></td>
+                    <td>Unity Catalog Function, Genie, Metric View</td>
+                    <td><code>jobs</code> (notebook_task + REST API/SQL) + <code>schemas</code></td>
+                    <td>SQL 노트북 또는 REST API 호출 노트북을 DAB Job으로 실행하여 배포. 모두 실행 테스트 성공</td>
                 </tr>
                 <tr>
-                    <td><span class="badge badge-no">미지원 (3개)</span></td>
-                    <td>Lakebase, Genie, AgentBricks (Knowledge Assistant, Supervisor Agent)</td>
+                    <td><span class="badge badge-no">미지원 (2개)</span></td>
+                    <td>Lakebase, AgentBricks (Knowledge Assistant, Supervisor Agent)</td>
                     <td>해당 없음</td>
-                    <td>REST API 또는 UI에서만 관리 가능. DAB Job에서 API 호출로 자동화 가능</td>
+                    <td>UI에서만 관리 가능. DAB Job에서 지식 베이스 준비나 에이전트 설정 코드 배포는 가능</td>
                 </tr>
             </tbody>
         </table>

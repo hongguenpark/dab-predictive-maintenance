@@ -1,0 +1,8 @@
+resources:
+  jobs:
+    deploy_genie_space:
+      name: "[${bundle.target}] PM - Genie Space 배포"
+      tasks:
+        - task_key: create_genie_space
+          notebook_task:
+            notebook_path: ./src/create_genie_space.py

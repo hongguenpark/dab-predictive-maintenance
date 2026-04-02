@@ -13,6 +13,7 @@ include:
   # App은 워크스페이스 300개 제한으로 별도 배포 필요
   # - "06_databricks_app/databricks.yml"
   - "07_aibi_dashboard/databricks.yml"
+  - "08_genie/databricks.yml"
   - "09_metric_view/databricks.yml"
   - "10_ml_custom_model/databricks.yml"
   # Model Serving은 모델 등록 후 별도 배포

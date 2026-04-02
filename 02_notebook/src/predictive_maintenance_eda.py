@@ -49,7 +49,6 @@ display(df_equipment)
 # COMMAND ----------
 
 from datetime import datetime, timedelta
-import numpy as np
 
 sensor_records = []
 base_time = datetime(2024, 1, 1)
@@ -127,17 +126,18 @@ display(df_anomalies.groupBy("equipment_id", "anomaly_type").count().orderBy("eq
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   e.equipment_id,
-# MAGIC   e.equipment_name,
-# MAGIC   e.criticality,
-# MAGIC   e.operating_hours,
-# MAGIC   ROUND(AVG(s.vibration_rms), 2) as avg_vibration,
-# MAGIC   ROUND(AVG(s.temperature_c), 1) as avg_temp,
-# MAGIC   hg_demos.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status,
-# MAGIC   ROUND(hg_demos.predictive_maintenance.estimate_rul(e.operating_hours, AVG(s.vibration_rms), AVG(s.temperature_c)), 0) as rul_hours
-# MAGIC FROM hg_demos.predictive_maintenance.equipment_master e
-# MAGIC JOIN hg_demos.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id
-# MAGIC GROUP BY e.equipment_id, e.equipment_name, e.criticality, e.operating_hours
-# MAGIC ORDER BY rul_hours ASC
+# UC Function 없이 PySpark로 상태 요약
+df_summary = df_sensors.join(df_equipment, "equipment_id").groupBy(
+    "equipment_id", "equipment_name", "criticality", "operating_hours"
+).agg(
+    F.round(F.avg("vibration_rms"), 2).alias("avg_vibration"),
+    F.round(F.avg("temperature_c"), 1).alias("avg_temp"),
+).withColumn("status",
+    F.when((F.col("avg_vibration") > 10.0) | (F.col("avg_temp") > 90.0), "긴급")
+     .when((F.col("avg_vibration") > 7.0) | (F.col("avg_temp") > 75.0), "위험")
+     .when((F.col("avg_vibration") > 4.5) | (F.col("avg_temp") > 60.0), "주의")
+     .otherwise("정상")
+).orderBy("avg_vibration", ascending=False)
+
+display(df_summary)
+print(f"✅ 분석 완료: {df_summary.count()}개 장비 상태 요약")
