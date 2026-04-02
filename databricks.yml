@@ -11,16 +11,11 @@ include:
   - "02_notebook/databricks.yml"
   - "03_job/databricks.yml"
   - "04_dlt_pipeline/databricks.yml"
-  - "05_lakebase/databricks.yml"
   - "06_databricks_app/databricks.yml"
   - "07_aibi_dashboard/databricks.yml"
-  - "08_genie/databricks.yml"
   - "09_metric_view/databricks.yml"
   - "10_ml_custom_model/databricks.yml"
-  # Model Serving은 모델 등록 후 2차 배포
-  # - "11_model_serving/databricks.yml"
-  - "12_agent_knowledge_assistant/databricks.yml"
-  - "13_agent_supervisor/databricks.yml"
+  - "11_model_serving/databricks.yml"
 
 targets:
   dev:

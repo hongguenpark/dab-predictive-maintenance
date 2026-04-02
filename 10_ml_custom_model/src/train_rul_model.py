@@ -104,7 +104,7 @@ with mlflow.start_run(run_name="rul_lightgbm_v1") as run:
     mlflow.sklearn.log_model(
         model,
         artifact_path="rul_model",
-        registered_model_name="ebay_anomaly_detection_catalog.predictive_maintenance.rul_prediction_model",
+        registered_model_name="ebay_anomaly_detection_catalog.predictive_maintenance.dev_hongguen_park_rul_prediction_model",
         input_example=X_train.head(1),
     )
 

@@ -23,10 +23,10 @@
                 "columns": [
                   {"fieldName": "equipment_id", "displayName": "장비 ID"},
                   {"fieldName": "equipment_name", "displayName": "장비명"},
+                  {"fieldName": "criticality", "displayName": "중요도"},
                   {"fieldName": "status", "displayName": "상태"},
                   {"fieldName": "avg_vibration", "displayName": "평균 진동"},
-                  {"fieldName": "avg_temperature", "displayName": "평균 온도"},
-                  {"fieldName": "rul_hours", "displayName": "잔여 수명(h)"}
+                  {"fieldName": "avg_temperature", "displayName": "평균 온도"}
                 ]
               }
             }
@@ -87,12 +87,12 @@
     {
       "name": "equipment_status",
       "displayName": "장비 상태",
-      "query": "SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status, ROUND(ebay_anomaly_detection_catalog.predictive_maintenance.estimate_rul(e.operating_hours, AVG(s.vibration_rms), AVG(s.temperature_c)), 0) as rul_hours FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY rul_hours ASC"
+      "query": "SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, CASE WHEN AVG(s.vibration_rms) > 10.0 OR AVG(s.temperature_c) > 90.0 THEN '긴급' WHEN AVG(s.vibration_rms) > 7.0 OR AVG(s.temperature_c) > 75.0 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60.0 THEN '주의' ELSE '정상' END AS status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY avg_vibration DESC"
     },
     {
       "name": "status_counts",
       "displayName": "상태별 장비 수",
-      "query": "WITH eq_status AS (SELECT e.equipment_id, ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(AVG(s.vibration_rms), AVG(s.temperature_c)) as status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as count FROM eq_status GROUP BY status"
+      "query": "WITH eq_status AS (SELECT e.equipment_id, CASE WHEN AVG(s.vibration_rms) > 10.0 OR AVG(s.temperature_c) > 90.0 THEN '긴급' WHEN AVG(s.vibration_rms) > 7.0 OR AVG(s.temperature_c) > 75.0 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60.0 THEN '주의' ELSE '정상' END AS status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as count FROM eq_status GROUP BY status"
     },
     {
       "name": "vibration_trend",
