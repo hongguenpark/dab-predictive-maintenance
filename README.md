@@ -8,27 +8,27 @@
 
 YAML 선언만으로 `databricks bundle deploy`로 자동 배포되는 리소스입니다.
 
-| # | 기능 | DAB 리소스 타입 | 배포 결과 | 비고 |
-|---|------|---------------|----------|------|
-| 1 | **Notebook** | `jobs` (notebook_task) | SUCCESS | DAB sync로 워크스페이스 자동 업로드 |
-| 2 | **Job (Workflow)** | `jobs` | SUCCESS | 멀티태스크, 스케줄, 알림 설정 포함 |
-| 3 | **SDP Pipeline (Lakeflow)** | `pipelines` | 배포 완료 | Medallion 아키텍처, Serverless, DLT Expectations |
-| 4 | **Lakebase** | `postgres_projects` + `postgres_branches` + `postgres_endpoints` | 배포 완료 | PostgreSQL 17, Autoscaling, Read-Write Endpoint |
-| 5 | **Databricks App** | `apps` | 배포 완료 | FastAPI 대시보드, SQL Warehouse 바인딩 |
-| 6 | **AI/BI Dashboard** | `dashboards` | 배포 완료 | Lakeview JSON, 2페이지 12위젯 |
-| 7 | **ML Custom Model** | `experiments` + `registered_models` | SUCCESS | MLflow 실험 추적 + UC 모델 레지스트리 |
-| 8 | **Model Serving** | `model_serving_endpoints` | 배포 완료 | Scale-to-zero, AI Gateway inference table |
+| # | 기능 | DAB 리소스 타입 | 구현 화면 | 배포 결과 |
+|---|------|---------------|----------|----------|
+| 1 | **Notebook** | `jobs` (notebook_task) | [Notebook](https://fevm-ebay-anomaly-detection.cloud.databricks.com/editor/notebooks/3590947964456485?o=7474657547399276#command/6432286664559444) | 실행 성공 |
+| 2 | **Job (Workflow)** | `jobs` | [Job](https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/341789730629397/tasks?o=7474657547399276) | 실행 성공 |
+| 3 | **SDP Pipeline (Lakeflow)** | `pipelines` | [Pipeline](https://fevm-ebay-anomaly-detection.cloud.databricks.com/pipelines/a00b20b6-733c-4434-ad69-314ef2378465/updates/d9a0ac94-17db-4299-8348-5f0ccfef21f4?o=7474657547399276) | 실행 성공 |
+| 4 | **Lakebase** | `postgres_projects` + `postgres_branches` | [Lakebase](https://fevm-ebay-anomaly-detection.cloud.databricks.com/lakebase/projects) | 자동 프로비저닝 |
+| 5 | **Databricks App** | `apps` | [App](https://pm-dashboard-app-hg-7474657547399276.aws.databricksapps.com/) | App 실행 중 |
+| 6 | **AI/BI Dashboard** | `dashboards` | [Dashboard](https://fevm-ebay-anomaly-detection.cloud.databricks.com/dashboardsv3/01f12e3ae7f0184499dc7b6d0ace8b9e/published?o=7474657547399276) | 즉시 조회 가능 |
+| 7 | **ML Custom Model** | `experiments` + `registered_models` | [Model](https://fevm-ebay-anomaly-detection.cloud.databricks.com/explore/data/models/ebay_anomaly_detection_catalog/predictive_maintenance/dev_hongguen_park_rul_prediction_model?o=7474657547399276) | 실행 성공 |
+| 8 | **Model Serving** | `model_serving_endpoints` | [Endpoint](https://fevm-ebay-anomaly-detection.cloud.databricks.com/ml/endpoints/dev_hongguen_park_pm-rul-prediction-hg?o=7474657547399276) | Endpoint 활성 |
 
 ### DAB Job 경유 배포 (4개)
 
 DAB 리소스 타입은 없지만, 노트북에서 SQL/REST API/SDK를 실행하는 Job으로 배포합니다.
 
-| # | 기능 | 배포 방법 | 배포 결과 | 비고 |
-|---|------|----------|----------|------|
-| 9 | **Unity Catalog Function** | SQL notebook (`CREATE FUNCTION`) | SUCCESS | 3개 함수: assess_vibration_status, estimate_rul, maintenance_priority_score |
-| 10 | **Metric View** | SQL notebook (`CREATE VIEW WITH METRICS`) | SUCCESS | 3개 Metric View: 가동률, 건강종합, OEE |
-| 11 | **Genie** | Python notebook (REST API) | SUCCESS | `serialized_space.data_sources.tables[].identifier`로 Metric View 연결 |
-| 12 | **AgentBricks Knowledge Assistant** | Python notebook (SDK `w.knowledge_assistants`) | SUCCESS | SDK로 Assistant 생성 + Knowledge Source 연결 |
+| # | 기능 | 배포 방법 | 구현 화면 | 배포 결과 |
+|---|------|----------|----------|----------|
+| 9 | **Unity Catalog Function** | SQL notebook | [Run](https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/731455833638601/runs/735380070821112?o=7474657547399276) | 실행 성공 |
+| 10 | **Metric View** | SQL notebook (WITH METRICS) | [Run](https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/844201380172727/runs/54784606581764?o=7474657547399276) | 실행 성공 |
+| 11 | **Genie** | Python notebook (REST API) | [Run](https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/485252954971199/runs/341376296644602?o=7474657547399276) | 실행 성공 |
+| 12 | **AgentBricks Knowledge Assistant** | Python notebook (SDK) | [Run](https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/998475660276268/runs/829770698906712?o=7474657547399276) | 실행 성공 |
 
 ### DAB 미지원 - UI 전용 (1개)
 
