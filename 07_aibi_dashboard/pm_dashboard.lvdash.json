@@ -100,11 +100,11 @@
                   "datasetName": "ds_kpi_total",
                   "fields": [
                     {
-                      "name": "total",
-                      "expression": "`total`"
+                      "name": "sum(total)",
+                      "expression": "SUM(`total`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -113,7 +113,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "total",
+                  "fieldName": "sum(total)",
                   "displayName": "총 장비 수"
                 }
               }
@@ -136,11 +136,11 @@
                   "datasetName": "ds_kpi_alert",
                   "fields": [
                     {
-                      "name": "alert_cnt",
-                      "expression": "`alert_cnt`"
+                      "name": "sum(alert_cnt)",
+                      "expression": "SUM(`alert_cnt`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -149,7 +149,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "alert_cnt",
+                  "fieldName": "sum(alert_cnt)",
                   "displayName": "위험/긴급 장비"
                 }
               }
@@ -172,11 +172,11 @@
                   "datasetName": "ds_kpi_vib",
                   "fields": [
                     {
-                      "name": "avg_vib",
-                      "expression": "`avg_vib`"
+                      "name": "sum(avg_vib)",
+                      "expression": "SUM(`avg_vib`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -185,7 +185,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "avg_vib",
+                  "fieldName": "sum(avg_vib)",
                   "displayName": "전체 평균 진동 (RMS)"
                 }
               }
@@ -208,11 +208,11 @@
                   "datasetName": "ds_kpi_temp",
                   "fields": [
                     {
-                      "name": "avg_temp",
-                      "expression": "`avg_temp`"
+                      "name": "sum(avg_temp)",
+                      "expression": "SUM(`avg_temp`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -221,7 +221,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "avg_temp",
+                  "fieldName": "sum(avg_temp)",
                   "displayName": "전체 평균 온도 (℃)"
                 }
               }
@@ -262,11 +262,17 @@
               "encodings": {
                 "angle": {
                   "fieldName": "cnt",
-                  "displayName": "장비 수"
+                  "displayName": "장비 수",
+                  "scale": {
+                    "type": "quantitative"
+                  }
                 },
                 "color": {
                   "fieldName": "status",
-                  "displayName": "상태"
+                  "displayName": "상태",
+                  "scale": {
+                    "type": "categorical"
+                  }
                 }
               }
             }
@@ -455,7 +461,7 @@
                   },
                   {
                     "fieldName": "line",
-                    "displayName": "생산 라인"
+                    "displayName": "생산라인"
                   },
                   {
                     "fieldName": "criticality",
@@ -467,31 +473,31 @@
                   },
                   {
                     "fieldName": "operating_hours",
-                    "displayName": "운전시간 (h)"
+                    "displayName": "운전시간(h)"
                   },
                   {
                     "fieldName": "avg_vibration",
-                    "displayName": "평균 진동"
+                    "displayName": "평균진동"
                   },
                   {
                     "fieldName": "max_vibration",
-                    "displayName": "최대 진동"
+                    "displayName": "최대진동"
                   },
                   {
                     "fieldName": "avg_temperature",
-                    "displayName": "평균 온도"
+                    "displayName": "평균온도"
                   },
                   {
                     "fieldName": "max_temperature",
-                    "displayName": "최대 온도"
+                    "displayName": "최대온도"
                   },
                   {
                     "fieldName": "avg_pressure",
-                    "displayName": "평균 압력"
+                    "displayName": "압력"
                   },
                   {
                     "fieldName": "reading_count",
-                    "displayName": "측정 건수"
+                    "displayName": "측정수"
                   }
                 ]
               }
