@@ -4,7 +4,7 @@
       "name": "ds_kpi_summary",
       "displayName": "KPI 요약",
       "queryLines": [
-        "SELECT COUNT(DISTINCT e.equipment_id) as total_equip, SUM(CASE WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN 1 ELSE 0 END) as alert_equip, ROUND(AVG(s.vibration_rms), 2) as overall_avg_vib, ROUND(AVG(s.temperature_c), 1) as overall_avg_temp, ROUND(AVG(s.pressure_bar), 1) as overall_avg_press FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id"
+        "WITH equip_stats AS (SELECT e.equipment_id, AVG(s.vibration_rms) as avg_vib, AVG(s.temperature_c) as avg_temp, AVG(s.pressure_bar) as avg_press FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT COUNT(*) as total_equip, SUM(CASE WHEN avg_vib > 7 OR avg_temp > 75 THEN 1 ELSE 0 END) as alert_equip, ROUND(AVG(avg_vib), 2) as overall_avg_vib, ROUND(AVG(avg_temp), 1) as overall_avg_temp, ROUND(AVG(avg_press), 1) as overall_avg_press FROM equip_stats"
       ]
     },
     {
@@ -110,23 +110,38 @@
                 "columns": [
                   {
                     "fieldName": "total_equip",
-                    "displayName": "총 장비 수"
+                    "displayName": "총 장비 수",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "alert_equip",
-                    "displayName": "위험/긴급 장비"
+                    "displayName": "위험/긴급 장비",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "overall_avg_vib",
-                    "displayName": "전체 평균 진동 (RMS)"
+                    "displayName": "평균 진동 (RMS)",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "overall_avg_temp",
-                    "displayName": "전체 평균 온도 (℃)"
+                    "displayName": "평균 온도 (℃)",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "overall_avg_press",
-                    "displayName": "전체 평균 압력 (bar)"
+                    "displayName": "평균 압력 (bar)",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   }
                 ]
               }
@@ -291,7 +306,7 @@
         },
         {
           "widget": {
-            "name": "w_table",
+            "name": "w_detail_table",
             "queries": [
               {
                 "name": "main_query",
@@ -358,51 +373,87 @@
                 "columns": [
                   {
                     "fieldName": "equipment_id",
-                    "displayName": "장비 ID"
+                    "displayName": "장비 ID",
+                    "scale": {
+                      "type": "categorical"
+                    }
                   },
                   {
                     "fieldName": "equipment_name",
-                    "displayName": "장비명"
+                    "displayName": "장비명",
+                    "scale": {
+                      "type": "categorical"
+                    }
                   },
                   {
                     "fieldName": "line",
-                    "displayName": "생산라인"
+                    "displayName": "생산라인",
+                    "scale": {
+                      "type": "categorical"
+                    }
                   },
                   {
                     "fieldName": "criticality",
-                    "displayName": "중요도"
+                    "displayName": "중요도",
+                    "scale": {
+                      "type": "categorical"
+                    }
                   },
                   {
                     "fieldName": "status",
-                    "displayName": "상태"
+                    "displayName": "상태",
+                    "scale": {
+                      "type": "categorical"
+                    }
                   },
                   {
                     "fieldName": "operating_hours",
-                    "displayName": "운전시간(h)"
+                    "displayName": "운전시간(h)",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "avg_vibration",
-                    "displayName": "평균진동"
+                    "displayName": "평균진동",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "max_vibration",
-                    "displayName": "최대진동"
+                    "displayName": "최대진동",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "avg_temperature",
-                    "displayName": "평균온도"
+                    "displayName": "평균온도",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "max_temperature",
-                    "displayName": "최대온도"
+                    "displayName": "최대온도",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "avg_pressure",
-                    "displayName": "압력"
+                    "displayName": "압력",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   },
                   {
                     "fieldName": "reading_count",
-                    "displayName": "측정수"
+                    "displayName": "측정수",
+                    "scale": {
+                      "type": "quantitative"
+                    }
                   }
                 ]
               }
