@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Databricks Asset Bundles (DAB) 기능별 배포 테스트 결과</title>
+    <title>DAB 기능별 배포 테스트 결과 - 예측 정비</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; color: #1a202c; line-height: 1.6; }
@@ -31,11 +31,9 @@
         .link-btn:hover { background: #FF3621; color: white; }
         .link-btn.github { background: #1e293b; color: white; }
         .link-btn.databricks { background: #FF3621; color: white; }
-        .link-btn.run { background: #22c55e; color: white; }
-        .notes { font-size: 13px; color: #64748b; line-height: 1.5; }
-        .notes strong { color: #334155; }
         .section-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #1e293b; }
         .footer { text-align: center; padding: 24px; color: #94a3b8; font-size: 13px; }
+        .notes { font-size: 13px; color: #64748b; line-height: 1.5; }
         @media (max-width: 768px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
@@ -45,180 +43,87 @@
         <h1>Databricks Asset Bundles (DAB) 기능별 배포 테스트 결과</h1>
         <p>예측 정비 (Predictive Maintenance) 시나리오 기반 - 13개 Databricks 기능 DAB 배포 검증</p>
         <div class="meta-info">
-            <span>테스트 일시: 2026-04-02</span>
+            <span>테스트 일시: 2026-04-03</span>
             <span>워크스페이스: fevm-ebay-anomaly-detection</span>
             <span>카탈로그: ebay_anomaly_detection_catalog</span>
-            <span>테스터: Honggeun Park</span>
         </div>
     </header>
 
     <div class="summary-cards">
-        <div class="card" style="border-left: 4px solid #22c55e;">
-            <div class="number" style="color:#22c55e;">9</div>
-            <div class="label">DAB 배포 가능</div>
-        </div>
-        <div class="card" style="border-left: 4px solid #ef4444;">
-            <div class="number" style="color:#ef4444;">4</div>
-            <div class="label">DAB 배포 불가 (UI 전용)</div>
-        </div>
-        <div class="card" style="border-left: 4px solid #3b82f6;">
-            <div class="number" style="color:#3b82f6;">13</div>
-            <div class="label">총 테스트 기능</div>
-        </div>
-        <div class="card" style="border-left: 4px solid #22c55e;">
-            <div class="number" style="color:#22c55e;">9 / 9</div>
-            <div class="label">Job 실행 SUCCESS</div>
-        </div>
+        <div class="card" style="border-left: 4px solid #22c55e;"><div class="number" style="color:#22c55e;">8</div><div class="label">DAB 직접 배포</div></div>
+        <div class="card" style="border-left: 4px solid #3b82f6;"><div class="number" style="color:#3b82f6;">4</div><div class="label">DAB Job 경유 배포</div></div>
+        <div class="card" style="border-left: 4px solid #ef4444;"><div class="number" style="color:#ef4444;">1</div><div class="label">DAB 미지원</div></div>
+        <div class="card" style="border-left: 4px solid #8b5cf6;"><div class="number" style="color:#8b5cf6;">13</div><div class="label">총 테스트 기능</div></div>
     </div>
 
-    <div class="section-title">기능별 상세 결과</div>
+    <div class="section-title">DAB 직접 배포 가능 (8개)</div>
     <table>
-        <thead>
-            <tr><th>#</th><th>기능</th><th>DAB 배포</th><th>DAB 리소스 타입</th><th>샘플 코드</th><th>배포된 리소스</th><th>실행 결과</th><th>주요 사항</th></tr>
-        </thead>
+        <thead><tr><th>#</th><th>기능</th><th>DAB 리소스 타입</th><th>샘플 코드</th><th>배포 결과</th><th>주요 사항</th></tr></thead>
         <tbody>
-            <tr>
-                <td>1</td><td><strong>Unity Catalog Function</strong></td>
-                <td><span class="badge badge-indirect">Job 경유</span></td>
-                <td><code>schemas</code> + <code>jobs</code></td>
-                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/01_unity_catalog_function" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/731455833638601?o=7474657547399276" class="link-btn databricks" target="_blank">Job</a></td>
-                <td><span class="badge badge-success">SUCCESS</span><br><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/?o=7474657547399276#job/731455833638601/run/735380070821112" class="link-btn run" target="_blank">Run</a></td>
-                <td class="notes">SQL 노트북에서 <code>CREATE FUNCTION</code> 실행. 3개 함수: assess_vibration_status, estimate_rul, maintenance_priority_score</td>
-            </tr>
-            <tr>
-                <td>2</td><td><strong>Notebook</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>jobs</code> (notebook_task)</td>
+            <tr><td>1</td><td><strong>Notebook</strong></td><td><code>jobs</code> (notebook_task)</td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/02_notebook" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/402790824010248?o=7474657547399276" class="link-btn databricks" target="_blank">Job</a></td>
-                <td><span class="badge badge-success">SUCCESS</span><br><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/?o=7474657547399276#job/402790824010248/run/216669503357074" class="link-btn run" target="_blank">Run</a></td>
-                <td class="notes">DAB sync로 워크스페이스 자동 업로드. EDA: 센서 데이터 8,000건 생성, 통계 분석, 이상 탐지</td>
-            </tr>
-            <tr>
-                <td>3</td><td><strong>Job (Workflow)</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>jobs</code></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">DAB sync로 워크스페이스 자동 업로드. EDA: 센서 데이터 8,000건 생성</td></tr>
+            <tr><td>2</td><td><strong>Job (Workflow)</strong></td><td><code>jobs</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/03_job" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/341789730629397?o=7474657547399276" class="link-btn databricks" target="_blank">Job</a></td>
-                <td><span class="badge badge-success">SUCCESS</span><br><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/?o=7474657547399276#job/341789730629397/run/395596724841775" class="link-btn run" target="_blank">Run</a></td>
-                <td class="notes">멀티태스크 Job (3단계): 데이터 수집 → 장비 상태 분석 → 알림 생성. 스케줄/알림 설정 포함</td>
-            </tr>
-            <tr>
-                <td>4</td><td><strong>DLT Pipeline (Lakeflow)</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>pipelines</code></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">멀티태스크 Job (3단계): 수집 → 분석 → 알림. 스케줄/알림 설정</td></tr>
+            <tr><td>3</td><td><strong>DLT Pipeline (Lakeflow)</strong></td><td><code>pipelines</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/04_dlt_pipeline" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/pipelines/a00b20b6-733c-4434-ad69-314ef2378465?o=7474657547399276" class="link-btn databricks" target="_blank">Pipeline</a></td>
                 <td><span class="badge badge-deployed">배포 완료</span></td>
-                <td class="notes">Medallion 아키텍처 (Bronze→Silver→Gold). DLT Expectations 데이터 품질 검증. Serverless</td>
-            </tr>
-            <tr style="background:#fef2f2;">
-                <td>5</td><td><strong>Lakebase</strong></td>
-                <td><span class="badge badge-no">DAB 미지원</span></td>
-                <td>해당 없음</td>
+                <td class="notes">Medallion (Bronze→Silver→Gold), Serverless, DLT Expectations</td></tr>
+            <tr><td>4</td><td><strong>Lakebase</strong></td><td><code>postgres_projects</code> + <code>postgres_branches</code> + <code>postgres_endpoints</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/05_lakebase" class="link-btn github" target="_blank">GitHub</a></td>
-                <td>-</td>
-                <td>-</td>
-                <td class="notes"><strong>DAB 리소스 타입 없음.</strong> Lakebase(관리형 PostgreSQL)는 UI에서만 프로비저닝 가능. REST API로 DB 생성 시도했으나 실제 Lakebase 인스턴스 배포는 안 됨</td>
-            </tr>
-            <tr>
-                <td>6</td><td><strong>Databricks App</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>apps</code></td>
+                <td><span class="badge badge-deployed">배포 완료</span></td>
+                <td class="notes">PostgreSQL 17, Autoscaling, Read-Write Endpoint. CLI v0.295+ 필요</td></tr>
+            <tr><td>5</td><td><strong>Databricks App</strong></td><td><code>apps</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/06_databricks_app" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/apps/pm-dashboard-app-hg?o=7474657547399276" class="link-btn databricks" target="_blank">App</a></td>
                 <td><span class="badge badge-deployed">배포 완료</span></td>
-                <td class="notes"><code>apps</code> 리소스로 직접 배포. FastAPI 대시보드 (장비 상태 모니터링), SQL Warehouse 바인딩</td>
-            </tr>
-            <tr>
-                <td>7</td><td><strong>AI/BI Dashboard</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>dashboards</code></td>
+                <td class="notes">FastAPI 대시보드, SQL Warehouse 바인딩</td></tr>
+            <tr><td>6</td><td><strong>AI/BI Dashboard</strong></td><td><code>dashboards</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/07_aibi_dashboard" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/dashboardsv3/01f12e3ae7f0184499dc7b6d0ace8b9e/published?o=7474657547399276" class="link-btn databricks" target="_blank">Dashboard</a></td>
                 <td><span class="badge badge-deployed">배포 완료</span></td>
-                <td class="notes">Lakeview JSON으로 대시보드 정의. 장비 상태 테이블, 상태 분포 차트, 진동 추이 라인차트</td>
-            </tr>
-            <tr style="background:#fef2f2;">
-                <td>8</td><td><strong>Genie</strong></td>
-                <td><span class="badge badge-no">DAB 미지원</span></td>
-                <td>해당 없음</td>
-                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/08_genie" class="link-btn github" target="_blank">GitHub</a></td>
-                <td>-</td>
-                <td>-</td>
-                <td class="notes"><strong>DAB 리소스 타입 없음.</strong> Genie Space는 REST API로 생성 시도했으나 내부 API 형식 제한으로 실패. UI에서만 생성 가능</td>
-            </tr>
-            <tr>
-                <td>9</td><td><strong>Metric View</strong></td>
-                <td><span class="badge badge-indirect">Job 경유</span></td>
-                <td><code>jobs</code> (SQL notebook)</td>
-                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/09_metric_view" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/844201380172727?o=7474657547399276" class="link-btn databricks" target="_blank">Job</a></td>
-                <td><span class="badge badge-success">SUCCESS</span><br><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/?o=7474657547399276#job/844201380172727/run/225960600523578" class="link-btn run" target="_blank">Run</a></td>
-                <td class="notes">SQL 노트북으로 OEE(종합설비효율), MTBF(평균고장간격), 가동률 메트릭 뷰 생성</td>
-            </tr>
-            <tr>
-                <td>10</td><td><strong>ML Custom Model</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>experiments</code> + <code>registered_models</code> + <code>jobs</code></td>
+                <td class="notes">Lakeview JSON, 2페이지 12위젯 (바차트 + 라인 + 산점도)</td></tr>
+            <tr><td>7</td><td><strong>ML Custom Model</strong></td><td><code>experiments</code> + <code>registered_models</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/10_ml_custom_model" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/ml/experiments/3590947964456493?o=7474657547399276" class="link-btn databricks" target="_blank">Experiment</a> <a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/771104280758079?o=7474657547399276" class="link-btn databricks" target="_blank">Training Job</a></td>
-                <td><span class="badge badge-success">SUCCESS</span><br><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/?o=7474657547399276#job/771104280758079/run/1054693764758338" class="link-btn run" target="_blank">Run</a></td>
-                <td class="notes">LightGBM RUL 예측 모델. MLflow 실험 추적 + UC 모델 레지스트리 등록 (Version 1 READY)</td>
-            </tr>
-            <tr>
-                <td>11</td><td><strong>Model Serving</strong></td>
-                <td><span class="badge badge-direct">직접 배포</span></td>
-                <td><code>model_serving_endpoints</code></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">LightGBM RUL 예측 모델, MLflow + UC 레지스트리</td></tr>
+            <tr><td>8</td><td><strong>Model Serving</strong></td><td><code>model_serving_endpoints</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/11_model_serving" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/ml/endpoints/dev_hongguen_park_pm-rul-prediction-hg?o=7474657547399276" class="link-btn databricks" target="_blank">Endpoint</a></td>
                 <td><span class="badge badge-deployed">배포 완료</span></td>
-                <td class="notes"><code>model_serving_endpoints</code>로 직접 배포. Scale-to-zero 설정, AI Gateway inference table 지원</td>
-            </tr>
-            <tr style="background:#fef2f2;">
-                <td>12</td><td><strong>AgentBricks Knowledge Assistant</strong></td>
-                <td><span class="badge badge-no">DAB 미지원</span></td>
-                <td>해당 없음</td>
-                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/12_agent_knowledge_assistant" class="link-btn github" target="_blank">GitHub</a></td>
-                <td>-</td>
-                <td>-</td>
-                <td class="notes"><strong>UI에서만 구성 가능.</strong> AgentBricks Knowledge Assistant는 DAB 리소스 타입 없음. Vector Search 인덱스 연결, Foundation Model 선택 등 UI 작업 필요</td>
-            </tr>
-            <tr style="background:#fef2f2;">
-                <td>13</td><td><strong>AgentBricks Supervisor Agent</strong></td>
-                <td><span class="badge badge-no">DAB 미지원</span></td>
-                <td>해당 없음</td>
-                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/13_agent_supervisor" class="link-btn github" target="_blank">GitHub</a></td>
-                <td>-</td>
-                <td>-</td>
-                <td class="notes"><strong>UI에서만 구성 가능.</strong> Supervisor Agent는 Sub-Agent 연결, 시스템 프롬프트 등 UI 작업 필요. 대안: Mosaic AI Agent Framework + MLflow로 코드 기반 개발 후 model_serving_endpoints 배포</td>
-            </tr>
+                <td class="notes">Scale-to-zero, AI Gateway inference table</td></tr>
         </tbody>
     </table>
 
-    <div class="section-title">요약</div>
+    <div class="section-title">DAB Job 경유 배포 (4개)</div>
     <table>
-        <thead><tr><th>분류</th><th>개수</th><th>기능 목록</th><th>비고</th></tr></thead>
+        <thead><tr><th>#</th><th>기능</th><th>배포 방법</th><th>샘플 코드</th><th>배포 결과</th><th>주요 사항</th></tr></thead>
         <tbody>
-            <tr>
-                <td><span class="badge badge-direct">DAB 직접 배포</span></td>
-                <td><strong>7개</strong></td>
-                <td>Notebook, Job, DLT Pipeline, Databricks App, AI/BI Dashboard, ML (Experiment + Registered Model), Model Serving</td>
-                <td>YAML 선언으로 완전 자동화</td>
-            </tr>
-            <tr>
-                <td><span class="badge badge-indirect">DAB Job 경유 배포</span></td>
-                <td><strong>2개</strong></td>
-                <td>UC Function, Metric View</td>
-                <td>SQL 노트북을 Job으로 실행하여 배포. 실행 테스트 SUCCESS</td>
-            </tr>
-            <tr>
-                <td><span class="badge badge-no">DAB 미지원 (UI 전용)</span></td>
-                <td><strong>4개</strong></td>
-                <td>Lakebase, Genie, AgentBricks Knowledge Assistant, AgentBricks Supervisor Agent</td>
-                <td>DAB 리소스 타입 없음. Databricks UI에서만 생성/구성 가능</td>
-            </tr>
+            <tr><td>9</td><td><strong>Unity Catalog Function</strong></td><td>SQL notebook (<code>CREATE FUNCTION</code>)</td>
+                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/01_unity_catalog_function" class="link-btn github" target="_blank">GitHub</a></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">3개 함수: assess_vibration_status, estimate_rul, maintenance_priority_score</td></tr>
+            <tr><td>10</td><td><strong>Metric View</strong></td><td>SQL notebook (<code>CREATE VIEW WITH METRICS</code>)</td>
+                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/09_metric_view" class="link-btn github" target="_blank">GitHub</a></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">3개 Metric View: 가동률, 건강종합, OEE. Genie 연동</td></tr>
+            <tr><td>11</td><td><strong>Genie</strong></td><td>Python notebook (REST API)</td>
+                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/08_genie" class="link-btn github" target="_blank">GitHub</a></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">serialized_space.data_sources.tables[].identifier로 Metric View 연결</td></tr>
+            <tr><td>12</td><td><strong>AgentBricks Knowledge Assistant</strong></td><td>Python notebook (SDK <code>w.knowledge_assistants</code>)</td>
+                <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/12_agent_knowledge_assistant" class="link-btn github" target="_blank">GitHub</a></td>
+                <td><span class="badge badge-success">SUCCESS</span></td>
+                <td class="notes">SDK로 Assistant 생성 + UC Volume Knowledge Source 연결</td></tr>
+        </tbody>
+    </table>
+
+    <div class="section-title">DAB 미지원 - UI 전용 (1개)</div>
+    <table>
+        <thead><tr><th>#</th><th>기능</th><th>미지원 사유</th></tr></thead>
+        <tbody>
+            <tr><td>13</td><td><strong>AgentBricks Supervisor Agent</strong></td>
+                <td class="notes">REST API/SDK 없음. UI에서만 구성 가능. 대안: OpenAI Agents SDK + Databricks Apps 멀티에이전트 템플릿</td></tr>
         </tbody>
     </table>
 
@@ -228,7 +133,7 @@
         <a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com" class="link-btn databricks" target="_blank" style="font-size:14px;padding:8px 16px;">Databricks Workspace</a>
         <a href="https://docs.databricks.com/dev-tools/bundles/index.html" class="link-btn" target="_blank" style="font-size:14px;padding:8px 16px;">DAB 공식 문서</a>
     </div>
-    <div class="footer">Generated by DAB Feature Test | Honggeun Park | 2026-04-02</div>
+    <div class="footer">Generated by DAB Feature Test | Honggeun Park | 2026-04-03</div>
 </div>
 </body>
 </html>
