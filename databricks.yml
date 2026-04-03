@@ -13,6 +13,7 @@ include:
   - "04_dlt_pipeline/databricks.yml"
   - "06_databricks_app/databricks.yml"
   - "07_aibi_dashboard/databricks.yml"
+  - "08_genie/databricks.yml"
   - "09_metric_view/databricks.yml"
   - "10_ml_custom_model/databricks.yml"
   - "11_model_serving/databricks.yml"
