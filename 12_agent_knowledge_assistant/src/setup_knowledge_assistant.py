@@ -102,31 +102,67 @@ print(f"  - description: {ka.description}")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 3. Knowledge Source (UC 테이블) 연결
+# MAGIC ## 3. 정비 문서를 UC Volume에 업로드
 
 # COMMAND ----------
 
-from databricks.sdk.service.knowledgeassistants import KnowledgeSource, FileTableSpec
+import os, tempfile
 
-# Knowledge Source 추가 - 정비 매뉴얼 UC 테이블 연결
-try:
-    ks = w.knowledge_assistants.create_knowledge_source(
-        parent=ka.name,
-        knowledge_source=KnowledgeSource(
-            display_name="정비 매뉴얼",
-            description="설비 정비 매뉴얼 및 절차 문서",
-            file_table=FileTableSpec(
-                table_name=TABLE_NAME,
-                file_col="content",
-            ),
-        ),
-    )
-    print(f"Knowledge Source 추가 완료: {ks.name}")
-    print(f"  - display_name: {ks.display_name}")
-    print(f"  - table_name: {TABLE_NAME}")
-except Exception as e:
-    print(f"Knowledge Source 추가 중 오류 (API가 아직 지원하지 않을 수 있음): {e}")
-    print("수동으로 UI에서 Knowledge Source를 추가해 주세요.")
+VOLUME_PATH = f"/Volumes/{CATALOG}/{SCHEMA}/maintenance_docs"
+
+# Volume 생성
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{SCHEMA}.maintenance_docs")
+
+# 정비 문서를 텍스트 파일로 Volume에 저장
+for doc_id, title, content in knowledge_docs:
+    file_name = f"{doc_id}_{title.replace(' ', '_')}.txt"
+    file_path = f"{VOLUME_PATH}/{file_name}"
+    dbutils.fs.put(file_path, content, overwrite=True)
+
+print(f"정비 문서 {len(knowledge_docs)}개 파일 업로드 완료: {VOLUME_PATH}")
+
+# CDF 활성화 (Knowledge Source 요구사항)
+spark.sql(f"ALTER TABLE {TABLE_NAME} SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')")
+print("CDF 활성화 완료")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 4. Knowledge Source (UC Volume) 연결
+
+# COMMAND ----------
+
+import requests
+
+host = spark.conf.get("spark.databricks.workspaceUrl")
+token_obj = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()
+headers = {"Authorization": f"Bearer {token_obj}", "Content-Type": "application/json"}
+
+# Knowledge Source 추가 - UC Volume (FILES 타입)
+ks_payload = {
+    "display_name": "정비 매뉴얼 문서",
+    "description": "공장 설비 정비 매뉴얼, 절차서, 가이드 문서",
+    "source_type": "FILES",
+    "files": {
+        "path": VOLUME_PATH
+    }
+}
+
+ks_resp = requests.post(
+    f"https://{host}/api/2.1/{ka.name}/knowledge-sources",
+    headers=headers,
+    json=ks_payload
+)
+
+if ks_resp.status_code == 200:
+    ks_result = ks_resp.json()
+    print(f"Knowledge Source 연결 완료!")
+    print(f"  - ID: {ks_result.get('id')}")
+    print(f"  - state: {ks_result.get('state')}")
+    print(f"  - path: {VOLUME_PATH}")
+else:
+    print(f"Knowledge Source 연결 실패: {ks_resp.status_code}")
+    print(ks_resp.text[:300])
 
 # COMMAND ----------
 
@@ -142,6 +178,10 @@ result = {
         "name": ka.name,
         "display_name": ka.display_name,
         "description": ka.description,
+    },
+    "knowledge_source": {
+        "volume_path": VOLUME_PATH,
+        "source_type": "FILES",
     },
     "knowledge_base_table": TABLE_NAME,
     "document_count": len(knowledge_docs),
