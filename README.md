@@ -12,7 +12,7 @@ YAML 선언만으로 `databricks bundle deploy`로 자동 배포되는 리소스
 |---|------|---------------|----------|------|
 | 1 | **Notebook** | `jobs` (notebook_task) | SUCCESS | DAB sync로 워크스페이스 자동 업로드 |
 | 2 | **Job (Workflow)** | `jobs` | SUCCESS | 멀티태스크, 스케줄, 알림 설정 포함 |
-| 3 | **DLT Pipeline (Lakeflow)** | `pipelines` | 배포 완료 | Medallion 아키텍처, Serverless, DLT Expectations |
+| 3 | **SDP Pipeline (Lakeflow)** | `pipelines` | 배포 완료 | Medallion 아키텍처, Serverless, DLT Expectations |
 | 4 | **Lakebase** | `postgres_projects` + `postgres_branches` + `postgres_endpoints` | 배포 완료 | PostgreSQL 17, Autoscaling, Read-Write Endpoint |
 | 5 | **Databricks App** | `apps` | 배포 완료 | FastAPI 대시보드, SQL Warehouse 바인딩 |
 | 6 | **AI/BI Dashboard** | `dashboards` | 배포 완료 | Lakeview JSON, 2페이지 12위젯 |

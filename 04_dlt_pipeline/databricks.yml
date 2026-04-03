@@ -1,8 +1,8 @@
 resources:
   pipelines:
     pm_dlt_pipeline:
-      name: "[${bundle.target}] PM - 센서 데이터 DLT 파이프라인"
-      target: ebay_anomaly_detection_catalog.predictive_maintenance
+      name: "[${bundle.target}] PM - 센서 데이터 SDP 파이프라인"
+      target: predictive_maintenance
       catalog: ebay_anomaly_detection_catalog
       libraries:
         - notebook:
