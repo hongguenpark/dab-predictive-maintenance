@@ -1,8 +1,11 @@
 resources:
-  jobs:
-    deploy_lakebase:
-      name: "[${bundle.target}] PM - Lakebase 데이터베이스 배포"
-      tasks:
-        - task_key: setup_lakebase
-          notebook_task:
-            notebook_path: ./src/setup_lakebase.py
+  postgres_projects:
+    pm_lakebase:
+      project_id: 'pm-predictive-maintenance'
+      display_name: '예측 정비 Lakebase'
+      pg_version: 17
+  postgres_branches:
+    pm_branch:
+      parent: ${resources.postgres_projects.pm_lakebase.id}
+      branch_id: 'main'
+      no_expiry: true

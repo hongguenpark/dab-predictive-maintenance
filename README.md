@@ -4,7 +4,7 @@
 
 ## 테스트 결과 요약
 
-### DAB 직접 배포 가능 (7개)
+### DAB 직접 배포 가능 (8개)
 
 YAML 선언만으로 `databricks bundle deploy`로 자동 배포되는 리소스입니다.
 
@@ -13,30 +13,28 @@ YAML 선언만으로 `databricks bundle deploy`로 자동 배포되는 리소스
 | 1 | **Notebook** | `jobs` (notebook_task) | SUCCESS | DAB sync로 워크스페이스 자동 업로드 |
 | 2 | **Job (Workflow)** | `jobs` | SUCCESS | 멀티태스크, 스케줄, 알림 설정 포함 |
 | 3 | **DLT Pipeline (Lakeflow)** | `pipelines` | 배포 완료 | Medallion 아키텍처, Serverless, DLT Expectations |
-| 4 | **Databricks App** | `apps` | 배포 완료 | FastAPI 대시보드, SQL Warehouse 바인딩 |
-| 5 | **AI/BI Dashboard** | `dashboards` | 배포 완료 | Lakeview JSON, 2페이지 12위젯 |
-| 6 | **ML Custom Model** | `experiments` + `registered_models` | SUCCESS | MLflow 실험 추적 + UC 모델 레지스트리 |
-| 7 | **Model Serving** | `model_serving_endpoints` | 배포 완료 | Scale-to-zero, AI Gateway inference table |
+| 4 | **Lakebase** | `postgres_projects` + `postgres_branches` + `postgres_endpoints` | 배포 완료 | PostgreSQL 17, Autoscaling, Read-Write Endpoint |
+| 5 | **Databricks App** | `apps` | 배포 완료 | FastAPI 대시보드, SQL Warehouse 바인딩 |
+| 6 | **AI/BI Dashboard** | `dashboards` | 배포 완료 | Lakeview JSON, 2페이지 12위젯 |
+| 7 | **ML Custom Model** | `experiments` + `registered_models` | SUCCESS | MLflow 실험 추적 + UC 모델 레지스트리 |
+| 8 | **Model Serving** | `model_serving_endpoints` | 배포 완료 | Scale-to-zero, AI Gateway inference table |
 
-### DAB Job 경유 배포 (3개)
+### DAB Job 경유 배포 (4개)
 
-DAB 리소스 타입은 없지만, 노트북에서 SQL 또는 REST API를 실행하는 Job으로 배포합니다.
+DAB 리소스 타입은 없지만, 노트북에서 SQL/REST API/SDK를 실행하는 Job으로 배포합니다.
 
 | # | 기능 | 배포 방법 | 배포 결과 | 비고 |
 |---|------|----------|----------|------|
-| 8 | **Unity Catalog Function** | SQL notebook (`CREATE FUNCTION`) | SUCCESS | 3개 함수: assess_vibration_status, estimate_rul, maintenance_priority_score |
-| 9 | **Metric View** | SQL notebook (`CREATE VIEW WITH METRICS`) | SUCCESS | 3개 Metric View: 가동률, 건강종합, OEE |
-| 10 | **Genie** | Python notebook (REST API) | SUCCESS | `serialized_space.data_sources.tables[].identifier`로 테이블 연결 |
+| 9 | **Unity Catalog Function** | SQL notebook (`CREATE FUNCTION`) | SUCCESS | 3개 함수: assess_vibration_status, estimate_rul, maintenance_priority_score |
+| 10 | **Metric View** | SQL notebook (`CREATE VIEW WITH METRICS`) | SUCCESS | 3개 Metric View: 가동률, 건강종합, OEE |
+| 11 | **Genie** | Python notebook (REST API) | SUCCESS | `serialized_space.data_sources.tables[].identifier`로 Metric View 연결 |
+| 12 | **AgentBricks Knowledge Assistant** | Python notebook (SDK `w.knowledge_assistants`) | SUCCESS | SDK로 Assistant 생성 + Knowledge Source 연결 |
 
-### DAB 미지원 - UI 전용 (3개)
-
-DAB 리소스 타입이 없고 REST API로도 배포 불가하여 Databricks UI에서만 생성/구성 가능합니다.
+### DAB 미지원 - UI 전용 (1개)
 
 | # | 기능 | 미지원 사유 |
 |---|------|-----------|
-| 11 | **Lakebase** | DAB 리소스 타입 없음. UI에서만 PostgreSQL 인스턴스 프로비저닝 가능 |
-| 12 | **AgentBricks Knowledge Assistant** | UI에서만 구성 가능. Vector Search 인덱스 연결, Foundation Model 선택 등 UI 작업 필요 |
-| 13 | **AgentBricks Supervisor Agent** | UI에서만 구성 가능. Sub-Agent 연결, 시스템 프롬프트 등 UI 작업 필요 |
+| 13 | **AgentBricks Supervisor Agent** | REST API/SDK 없음. UI에서만 구성 가능. 대안: OpenAI Agents SDK + Databricks Apps 멀티에이전트 템플릿 |
 
 ## 시나리오: 예측 정비 (Predictive Maintenance)
 

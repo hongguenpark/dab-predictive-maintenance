@@ -1,13 +1,18 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 예측 정비 - Knowledge Assistant (AgentBricks) 설정
+# MAGIC # 예측 정비 - Knowledge Assistant (AgentBricks) SDK 배포
 # MAGIC
-# MAGIC AgentBricks Knowledge Assistant는 **DAB에서 직접 리소스로 배포할 수 없습니다**.
-# MAGIC 하지만 이 노트북을 DAB Job으로 배포하여 프로그래밍 방식으로 설정할 수 있습니다.
+# MAGIC Databricks SDK의 `KnowledgeAssistantsAPI`를 사용하여 Knowledge Assistant를 프로그래밍 방식으로 생성합니다.
 # MAGIC
 # MAGIC ### 구성 요소
-# MAGIC 1. 정비 매뉴얼 문서를 Vector Search 인덱스에 적재
-# MAGIC 2. Foundation Model + Vector Search를 결합한 RAG 에이전트 설정
+# MAGIC 1. 정비 매뉴얼 문서를 Unity Catalog 테이블에 적재
+# MAGIC 2. Knowledge Assistant 생성 (SDK)
+# MAGIC 3. Knowledge Source (UC 테이블) 연결
+
+# COMMAND ----------
+
+# MAGIC %pip install --upgrade databricks-sdk
+# MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -16,7 +21,12 @@
 
 # COMMAND ----------
 
-from pyspark.sql import functions as F
+# 카탈로그 및 스키마 설정
+CATALOG = "ebay_anomaly_detection_catalog"
+SCHEMA = "predictive_maintenance"
+TABLE_NAME = f"{CATALOG}.{SCHEMA}.maintenance_knowledge_base"
+
+# 정비 매뉴얼 지식 베이스 테이블 생성 (카탈로그와 스키마는 이미 존재)
 
 # 예측 정비 관련 지식 베이스 문서
 knowledge_docs = [
@@ -32,41 +42,109 @@ knowledge_docs = [
 
 schema = "doc_id STRING, title STRING, content STRING"
 df_docs = spark.createDataFrame(knowledge_docs, schema)
-df_docs.write.mode("overwrite").saveAsTable("ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_knowledge_base")
+df_docs.write.mode("overwrite").saveAsTable(TABLE_NAME)
 
-print(f"✅ {len(knowledge_docs)}개 정비 문서 적재 완료")
+print(f"정비 문서 {len(knowledge_docs)}건 적재 완료: {TABLE_NAME}")
 display(df_docs)
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 2. Vector Search 인덱스 생성 (수동 설정 필요)
-# MAGIC
-# MAGIC 아래 코드는 Vector Search 인덱스를 생성하는 참고 코드입니다.
-# MAGIC AgentBricks Knowledge Assistant는 UI에서 설정해야 합니다.
+# MAGIC ## 2. Knowledge Assistant 생성 (SDK)
 
 # COMMAND ----------
 
-# Vector Search 엔드포인트 및 인덱스 생성 참고 코드
-# from databricks.vector_search.client import VectorSearchClient
-#
-# vs_client = VectorSearchClient()
-#
-# # 엔드포인트 생성 (이미 존재하면 스킵)
-# vs_client.create_endpoint(name="pm_vs_endpoint", endpoint_type="STANDARD")
-#
-# # Delta Sync 인덱스 생성
-# vs_client.create_delta_sync_index(
-#     endpoint_name="pm_vs_endpoint",
-#     index_name="ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_kb_index",
-#     source_table_name="ebay_anomaly_detection_catalog.predictive_maintenance.maintenance_knowledge_base",
-#     pipeline_type="TRIGGERED",
-#     primary_key="doc_id",
-#     embedding_source_column="content",
-#     embedding_model_endpoint_name="databricks-gte-large-en",
-# )
+import json
+from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.knowledgeassistants import KnowledgeAssistant
 
-print("⚠️ Knowledge Assistant는 Databricks UI > AI/BI > AgentBricks에서 수동 구성이 필요합니다.")
-print("   - 위 Vector Search 인덱스를 지식 소스로 연결")
-print("   - Foundation Model 선택 (예: DBRX, Llama 3)")
-print("   - 시스템 프롬프트: '당신은 공장 설비 정비 전문 어시스턴트입니다.'")
+w = WorkspaceClient()
+
+ASSISTANT_DISPLAY_NAME = "PM - 예측 정비 Knowledge Assistant"
+ASSISTANT_DESCRIPTION = "공장 설비 예측 정비 전문 지식 어시스턴트"
+ASSISTANT_INSTRUCTIONS = (
+    "당신은 공장 설비 예측 정비 전문 AI 어시스턴트입니다. "
+    "정비 매뉴얼, 장비 사양, 정비 절차를 기반으로 한국어로 답변합니다."
+)
+
+# 기존 Knowledge Assistant 확인 및 삭제 (멱등성 보장)
+existing = None
+try:
+    ka_list = w.knowledge_assistants.list_knowledge_assistants()
+    for ka_item in ka_list.knowledge_assistants or []:
+        if ka_item.display_name == ASSISTANT_DISPLAY_NAME:
+            existing = ka_item
+            break
+except Exception as e:
+    print(f"기존 Knowledge Assistant 목록 조회 중 오류 (무시하고 진행): {e}")
+
+if existing:
+    print(f"기존 Knowledge Assistant 발견: {existing.name} - 삭제 후 재생성합니다.")
+    try:
+        w.knowledge_assistants.delete_knowledge_assistant(name=existing.name)
+        print("기존 Knowledge Assistant 삭제 완료")
+    except Exception as e:
+        print(f"삭제 중 오류: {e}")
+
+# Knowledge Assistant 생성
+ka = w.knowledge_assistants.create_knowledge_assistant(
+    knowledge_assistant=KnowledgeAssistant(
+        display_name=ASSISTANT_DISPLAY_NAME,
+        description=ASSISTANT_DESCRIPTION,
+        instructions=ASSISTANT_INSTRUCTIONS,
+    )
+)
+
+print(f"Knowledge Assistant 생성 완료: {ka.name}")
+print(f"  - display_name: {ka.display_name}")
+print(f"  - description: {ka.description}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 3. Knowledge Source (UC 테이블) 연결
+
+# COMMAND ----------
+
+from databricks.sdk.service.knowledgeassistants import KnowledgeSource, FileTableSpec
+
+# Knowledge Source 추가 - 정비 매뉴얼 UC 테이블 연결
+try:
+    ks = w.knowledge_assistants.create_knowledge_source(
+        parent=ka.name,
+        knowledge_source=KnowledgeSource(
+            display_name="정비 매뉴얼",
+            description="설비 정비 매뉴얼 및 절차 문서",
+            file_table=FileTableSpec(
+                table_name=TABLE_NAME,
+                file_col="content",
+            ),
+        ),
+    )
+    print(f"Knowledge Source 추가 완료: {ks.name}")
+    print(f"  - display_name: {ks.display_name}")
+    print(f"  - table_name: {TABLE_NAME}")
+except Exception as e:
+    print(f"Knowledge Source 추가 중 오류 (API가 아직 지원하지 않을 수 있음): {e}")
+    print("수동으로 UI에서 Knowledge Source를 추가해 주세요.")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 4. 결과 출력
+
+# COMMAND ----------
+
+# 최종 결과를 JSON으로 출력
+result = {
+    "status": "SUCCESS",
+    "knowledge_assistant": {
+        "name": ka.name,
+        "display_name": ka.display_name,
+        "description": ka.description,
+    },
+    "knowledge_base_table": TABLE_NAME,
+    "document_count": len(knowledge_docs),
+}
+
+print(json.dumps(result, ensure_ascii=False, indent=2))
