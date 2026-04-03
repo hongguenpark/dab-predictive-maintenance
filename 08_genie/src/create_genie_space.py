@@ -71,16 +71,22 @@ if existing_space_id:
     requests.delete(f"{base_url}/genie/spaces/{existing_space_id}", headers=headers)
     print(f"기존 Space {existing_space_id} 삭제")
 
-# Genie Space 생성
+# Genie Space 생성 - serialized_space에 data_sources.tables.identifier로 테이블 연결
+serialized_space = json.dumps({
+    "version": 2,
+    "data_sources": {
+        "tables": [
+            {"identifier": f"{CATALOG}.{SCHEMA}.equipment_master"},
+            {"identifier": f"{CATALOG}.{SCHEMA}.sensor_readings"}
+        ]
+    }
+})
+
 payload = {
-    "serialized_space": json.dumps({"version": 2}),
+    "serialized_space": serialized_space,
     "warehouse_id": WAREHOUSE_ID,
     "title": GENIE_TITLE,
-    "description": "공장 설비 센서 데이터를 자연어로 질의합니다. 장비 상태, 진동, 온도, 운전시간 등을 한국어로 질문하세요.",
-    "table_identifiers": [
-        f"{CATALOG}.{SCHEMA}.equipment_master",
-        f"{CATALOG}.{SCHEMA}.sensor_readings"
-    ]
+    "description": "공장 설비 센서 데이터를 자연어로 질의합니다. 장비 상태, 진동, 온도, 운전시간 등을 한국어로 질문하세요."
 }
 
 resp = requests.post(f"{base_url}/genie/spaces", headers=headers, json=payload)
