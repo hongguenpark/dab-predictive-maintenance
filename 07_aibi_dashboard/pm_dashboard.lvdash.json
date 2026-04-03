@@ -1,38 +1,17 @@
 {
   "datasets": [
     {
-      "name": "ds_kpi_total",
-      "displayName": "KPI 총장비",
+      "name": "ds_kpi_summary",
+      "displayName": "KPI 요약",
       "queryLines": [
-        "SELECT COUNT(DISTINCT equipment_id) as total FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master"
-      ]
-    },
-    {
-      "name": "ds_kpi_alert",
-      "displayName": "KPI 위험장비",
-      "queryLines": [
-        "SELECT COUNT(*) as alert_cnt FROM (SELECT e.equipment_id FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id HAVING AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75)"
-      ]
-    },
-    {
-      "name": "ds_kpi_vib",
-      "displayName": "KPI 평균진동",
-      "queryLines": [
-        "SELECT ROUND(AVG(vibration_rms), 2) as avg_vib FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings"
-      ]
-    },
-    {
-      "name": "ds_kpi_temp",
-      "displayName": "KPI 평균온도",
-      "queryLines": [
-        "SELECT ROUND(AVG(temperature_c), 1) as avg_temp FROM ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings"
+        "SELECT COUNT(DISTINCT e.equipment_id) as total_equip, SUM(CASE WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN 1 ELSE 0 END) as alert_equip, ROUND(AVG(s.vibration_rms), 2) as overall_avg_vib, ROUND(AVG(s.temperature_c), 1) as overall_avg_temp, ROUND(AVG(s.pressure_bar), 1) as overall_avg_press FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id"
       ]
     },
     {
       "name": "ds_status_counts",
       "displayName": "상태별 장비 수",
       "queryLines": [
-        "WITH eq AS (SELECT e.equipment_id, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as cnt FROM eq GROUP BY status"
+        "WITH eq AS (SELECT e.equipment_id, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT status, COUNT(*) as cnt FROM eq GROUP BY status ORDER BY CASE status WHEN '긴급' THEN 1 WHEN '위험' THEN 2 WHEN '주의' THEN 3 ELSE 4 END"
       ]
     },
     {
@@ -92,151 +71,77 @@
       "layout": [
         {
           "widget": {
-            "name": "w_kpi_total",
+            "name": "w_kpi_table",
             "queries": [
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "ds_kpi_total",
+                  "datasetName": "ds_kpi_summary",
                   "fields": [
                     {
-                      "name": "sum(total)",
-                      "expression": "SUM(`total`)"
+                      "name": "total_equip",
+                      "expression": "`total_equip`"
+                    },
+                    {
+                      "name": "alert_equip",
+                      "expression": "`alert_equip`"
+                    },
+                    {
+                      "name": "overall_avg_vib",
+                      "expression": "`overall_avg_vib`"
+                    },
+                    {
+                      "name": "overall_avg_temp",
+                      "expression": "`overall_avg_temp`"
+                    },
+                    {
+                      "name": "overall_avg_press",
+                      "expression": "`overall_avg_press`"
                     }
                   ],
-                  "disaggregated": false
+                  "disaggregated": true
                 }
               }
             ],
             "spec": {
               "version": 3,
-              "widgetType": "counter",
+              "widgetType": "table",
               "encodings": {
-                "value": {
-                  "fieldName": "sum(total)",
-                  "displayName": "총 장비 수"
-                }
+                "columns": [
+                  {
+                    "fieldName": "total_equip",
+                    "displayName": "총 장비 수"
+                  },
+                  {
+                    "fieldName": "alert_equip",
+                    "displayName": "위험/긴급 장비"
+                  },
+                  {
+                    "fieldName": "overall_avg_vib",
+                    "displayName": "전체 평균 진동 (RMS)"
+                  },
+                  {
+                    "fieldName": "overall_avg_temp",
+                    "displayName": "전체 평균 온도 (℃)"
+                  },
+                  {
+                    "fieldName": "overall_avg_press",
+                    "displayName": "전체 평균 압력 (bar)"
+                  }
+                ]
               }
             }
           },
           "position": {
             "x": 0,
             "y": 0,
-            "width": 3,
+            "width": 12,
             "height": 2
           }
         },
         {
           "widget": {
-            "name": "w_kpi_alert",
-            "queries": [
-              {
-                "name": "main_query",
-                "query": {
-                  "datasetName": "ds_kpi_alert",
-                  "fields": [
-                    {
-                      "name": "sum(alert_cnt)",
-                      "expression": "SUM(`alert_cnt`)"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              }
-            ],
-            "spec": {
-              "version": 3,
-              "widgetType": "counter",
-              "encodings": {
-                "value": {
-                  "fieldName": "sum(alert_cnt)",
-                  "displayName": "위험/긴급 장비"
-                }
-              }
-            }
-          },
-          "position": {
-            "x": 3,
-            "y": 0,
-            "width": 3,
-            "height": 2
-          }
-        },
-        {
-          "widget": {
-            "name": "w_kpi_vib",
-            "queries": [
-              {
-                "name": "main_query",
-                "query": {
-                  "datasetName": "ds_kpi_vib",
-                  "fields": [
-                    {
-                      "name": "sum(avg_vib)",
-                      "expression": "SUM(`avg_vib`)"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              }
-            ],
-            "spec": {
-              "version": 3,
-              "widgetType": "counter",
-              "encodings": {
-                "value": {
-                  "fieldName": "sum(avg_vib)",
-                  "displayName": "전체 평균 진동 (RMS)"
-                }
-              }
-            }
-          },
-          "position": {
-            "x": 6,
-            "y": 0,
-            "width": 3,
-            "height": 2
-          }
-        },
-        {
-          "widget": {
-            "name": "w_kpi_temp",
-            "queries": [
-              {
-                "name": "main_query",
-                "query": {
-                  "datasetName": "ds_kpi_temp",
-                  "fields": [
-                    {
-                      "name": "sum(avg_temp)",
-                      "expression": "SUM(`avg_temp`)"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              }
-            ],
-            "spec": {
-              "version": 3,
-              "widgetType": "counter",
-              "encodings": {
-                "value": {
-                  "fieldName": "sum(avg_temp)",
-                  "displayName": "전체 평균 온도 (℃)"
-                }
-              }
-            }
-          },
-          "position": {
-            "x": 9,
-            "y": 0,
-            "width": 3,
-            "height": 2
-          }
-        },
-        {
-          "widget": {
-            "name": "w_status_pie",
+            "name": "w_status_bar",
             "queries": [
               {
                 "name": "main_query",
@@ -258,20 +163,20 @@
             ],
             "spec": {
               "version": 3,
-              "widgetType": "pie",
+              "widgetType": "bar",
               "encodings": {
-                "angle": {
-                  "fieldName": "cnt",
-                  "displayName": "장비 수",
-                  "scale": {
-                    "type": "quantitative"
-                  }
-                },
-                "color": {
+                "x": {
                   "fieldName": "status",
                   "displayName": "상태",
                   "scale": {
                     "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "cnt",
+                  "displayName": "장비 수",
+                  "scale": {
+                    "type": "quantitative"
                   }
                 }
               }
