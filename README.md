@@ -34,7 +34,7 @@ DAB 리소스 타입은 없지만, 노트북에서 SQL/REST API/SDK를 실행하
 
 | # | 기능 | 미지원 사유 |
 |---|------|-----------|
-| 13 | **AgentBricks Supervisor Agent** | REST API/SDK 없음. UI에서만 구성 가능. 대안: OpenAI Agents SDK + Databricks Apps 멀티에이전트 템플릿 |
+| 13 | **AgentBricks Supervisor Agent** | REST API/SDK 없음. UI에서만 구성 가능 |
 
 ## 시나리오: 예측 정비 (Predictive Maintenance)
 
