@@ -16,7 +16,7 @@ w = WorkspaceClient()
 def get_connection():
     return dbsql.connect(
         server_hostname=w.config.host.replace("https://", ""),
-        http_path=f"/sql/1.0/warehouses/{os.environ['DATABRICKS_WAREHOUSE_ID']}",
+        http_path=f"/sql/1.0/warehouses/{os.environ.get('DATABRICKS_WAREHOUSE_ID', '86ec93a98d884cde')}",
         credentials_provider=lambda: w.config.authenticate,
     )
 
@@ -27,13 +27,16 @@ def dashboard():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # 장비 상태 조회
         cursor.execute("""
             SELECT e.equipment_id, e.equipment_name, e.criticality, e.operating_hours,
                    ROUND(AVG(s.vibration_rms), 2) as avg_vibration,
                    ROUND(AVG(s.temperature_c), 1) as avg_temp,
-                   ebay_anomaly_detection_catalog.predictive_maintenance.assess_vibration_status(
-                       AVG(s.vibration_rms), AVG(s.temperature_c)) as status
+                   CASE
+                       WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급'
+                       WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험'
+                       WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의'
+                       ELSE '정상'
+                   END as status
             FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e
             JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id
             GROUP BY ALL ORDER BY e.equipment_id
@@ -62,7 +65,7 @@ def dashboard():
             th {{ background: #1e40af; color: white; }}
             tr:hover {{ background: #f1f5f9; }}
         </style></head>
-        <body><h1>🏭 예측 정비 - 장비 상태 모니터링</h1>
+        <body><h1>예측 정비 - 장비 상태 모니터링</h1>
         <table><tr><th>장비ID</th><th>장비명</th><th>중요도</th><th>운전시간</th>
         <th>평균진동</th><th>평균온도</th><th>상태</th></tr>{table_rows}</table>
         </body></html>"""

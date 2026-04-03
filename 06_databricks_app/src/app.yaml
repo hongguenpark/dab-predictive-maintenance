@@ -7,4 +7,4 @@ command:
   - "8000"
 env:
   - name: DATABRICKS_WAREHOUSE_ID
-    valueFrom: DATABRICKS_WAREHOUSE_ID
+    value: "86ec93a98d884cde"
