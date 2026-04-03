@@ -1,10 +1,17 @@
 {
   "datasets": [
     {
-      "name": "ds_kpi_summary",
-      "displayName": "KPI 요약",
+      "name": "ds_equip_vib",
+      "displayName": "장비별 진동",
       "queryLines": [
-        "WITH equip_stats AS (SELECT e.equipment_id, AVG(s.vibration_rms) as avg_vib, AVG(s.temperature_c) as avg_temp, AVG(s.pressure_bar) as avg_press FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_id) SELECT COUNT(*) as total_equip, SUM(CASE WHEN avg_vib > 7 OR avg_temp > 75 THEN 1 ELSE 0 END) as alert_equip, ROUND(AVG(avg_vib), 2) as overall_avg_vib, ROUND(AVG(avg_temp), 1) as overall_avg_temp, ROUND(AVG(avg_press), 1) as overall_avg_press FROM equip_stats"
+        "SELECT e.equipment_name, ROUND(AVG(s.vibration_rms), 2) as avg_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_vibration DESC"
+      ]
+    },
+    {
+      "name": "ds_equip_temp",
+      "displayName": "장비별 온도",
+      "queryLines": [
+        "SELECT e.equipment_name, ROUND(AVG(s.temperature_c), 1) as avg_temperature FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_temperature DESC"
       ]
     },
     {
@@ -15,24 +22,38 @@
       ]
     },
     {
-      "name": "ds_vib_by_equip",
-      "displayName": "장비별 진동",
+      "name": "ds_equip_hours",
+      "displayName": "장비별 운전시간",
       "queryLines": [
-        "SELECT e.equipment_name, ROUND(AVG(s.vibration_rms), 2) as avg_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_vibration DESC"
+        "SELECT equipment_name, operating_hours FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master ORDER BY operating_hours DESC"
       ]
     },
     {
-      "name": "ds_temp_by_equip",
-      "displayName": "장비별 온도",
+      "name": "ds_equip_max_vib",
+      "displayName": "장비별 최대 진동",
       "queryLines": [
-        "SELECT e.equipment_name, ROUND(AVG(s.temperature_c), 1) as avg_temperature FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_temperature DESC"
+        "SELECT e.equipment_name, ROUND(MAX(s.vibration_rms), 2) as max_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY max_vibration DESC"
       ]
     },
     {
-      "name": "ds_equipment_status",
-      "displayName": "장비 상태 종합",
+      "name": "ds_equip_press",
+      "displayName": "장비별 압력",
       "queryLines": [
-        "SELECT e.equipment_id, e.equipment_name, e.line, e.criticality, e.operating_hours, ROUND(AVG(s.vibration_rms), 2) as avg_vibration, ROUND(MAX(s.vibration_rms), 2) as max_vibration, ROUND(AVG(s.temperature_c), 1) as avg_temperature, ROUND(MAX(s.temperature_c), 1) as max_temperature, ROUND(AVG(s.pressure_bar), 1) as avg_pressure, CASE WHEN AVG(s.vibration_rms) > 10 OR AVG(s.temperature_c) > 90 THEN '긴급' WHEN AVG(s.vibration_rms) > 7 OR AVG(s.temperature_c) > 75 THEN '위험' WHEN AVG(s.vibration_rms) > 4.5 OR AVG(s.temperature_c) > 60 THEN '주의' ELSE '정상' END AS status, COUNT(*) as reading_count FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY ALL ORDER BY avg_vibration DESC"
+        "SELECT e.equipment_name, ROUND(AVG(s.pressure_bar), 1) as avg_pressure FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.equipment_name ORDER BY avg_pressure"
+      ]
+    },
+    {
+      "name": "ds_crit_vib",
+      "displayName": "중요도별 진동",
+      "queryLines": [
+        "SELECT e.criticality, ROUND(AVG(s.vibration_rms), 2) as avg_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.criticality ORDER BY CASE e.criticality WHEN '핵심' THEN 1 WHEN '중요' THEN 2 ELSE 3 END"
+      ]
+    },
+    {
+      "name": "ds_line_vib",
+      "displayName": "라인별 진동",
+      "queryLines": [
+        "SELECT e.line, ROUND(AVG(s.vibration_rms), 2) as avg_vibration FROM ebay_anomaly_detection_catalog.predictive_maintenance.equipment_master e JOIN ebay_anomaly_detection_catalog.predictive_maintenance.sensor_readings s ON e.equipment_id = s.equipment_id GROUP BY e.line ORDER BY avg_vibration DESC"
       ]
     },
     {
@@ -69,91 +90,6 @@
       "name": "p1_overview",
       "displayName": "장비 상태 개요",
       "layout": [
-        {
-          "widget": {
-            "name": "w_kpi_table",
-            "queries": [
-              {
-                "name": "main_query",
-                "query": {
-                  "datasetName": "ds_kpi_summary",
-                  "fields": [
-                    {
-                      "name": "total_equip",
-                      "expression": "`total_equip`"
-                    },
-                    {
-                      "name": "alert_equip",
-                      "expression": "`alert_equip`"
-                    },
-                    {
-                      "name": "overall_avg_vib",
-                      "expression": "`overall_avg_vib`"
-                    },
-                    {
-                      "name": "overall_avg_temp",
-                      "expression": "`overall_avg_temp`"
-                    },
-                    {
-                      "name": "overall_avg_press",
-                      "expression": "`overall_avg_press`"
-                    }
-                  ],
-                  "disaggregated": true
-                }
-              }
-            ],
-            "spec": {
-              "version": 3,
-              "widgetType": "table",
-              "encodings": {
-                "columns": [
-                  {
-                    "fieldName": "total_equip",
-                    "displayName": "총 장비 수",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "alert_equip",
-                    "displayName": "위험/긴급 장비",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "overall_avg_vib",
-                    "displayName": "평균 진동 (RMS)",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "overall_avg_temp",
-                    "displayName": "평균 온도 (℃)",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "overall_avg_press",
-                    "displayName": "평균 압력 (bar)",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "position": {
-            "x": 0,
-            "y": 0,
-            "width": 12,
-            "height": 2
-          }
-        },
         {
           "widget": {
             "name": "w_status_bar",
@@ -199,7 +135,107 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 0,
+            "width": 4,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "w_hours_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_equip_hours",
+                  "fields": [
+                    {
+                      "name": "equipment_name",
+                      "expression": "`equipment_name`"
+                    },
+                    {
+                      "name": "operating_hours",
+                      "expression": "`operating_hours`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "equipment_name",
+                  "displayName": "장비",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "operating_hours",
+                  "displayName": "운전시간 (h)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "w_crit_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_crit_vib",
+                  "fields": [
+                    {
+                      "name": "criticality",
+                      "expression": "`criticality`"
+                    },
+                    {
+                      "name": "avg_vibration",
+                      "expression": "`avg_vibration`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "criticality",
+                  "displayName": "중요도",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg_vibration",
+                  "displayName": "평균 진동",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
             "width": 4,
             "height": 4
           }
@@ -211,7 +247,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "ds_vib_by_equip",
+                  "datasetName": "ds_equip_vib",
                   "fields": [
                     {
                       "name": "equipment_name",
@@ -248,8 +284,8 @@
             }
           },
           "position": {
-            "x": 4,
-            "y": 2,
+            "x": 0,
+            "y": 4,
             "width": 4,
             "height": 4
           }
@@ -261,7 +297,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "ds_temp_by_equip",
+                  "datasetName": "ds_equip_temp",
                   "fields": [
                     {
                       "name": "equipment_name",
@@ -298,68 +334,28 @@
             }
           },
           "position": {
-            "x": 8,
-            "y": 2,
+            "x": 4,
+            "y": 4,
             "width": 4,
             "height": 4
           }
         },
         {
           "widget": {
-            "name": "w_detail_table",
+            "name": "w_press_bar",
             "queries": [
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "ds_equipment_status",
+                  "datasetName": "ds_equip_press",
                   "fields": [
-                    {
-                      "name": "equipment_id",
-                      "expression": "`equipment_id`"
-                    },
                     {
                       "name": "equipment_name",
                       "expression": "`equipment_name`"
                     },
                     {
-                      "name": "line",
-                      "expression": "`line`"
-                    },
-                    {
-                      "name": "criticality",
-                      "expression": "`criticality`"
-                    },
-                    {
-                      "name": "status",
-                      "expression": "`status`"
-                    },
-                    {
-                      "name": "operating_hours",
-                      "expression": "`operating_hours`"
-                    },
-                    {
-                      "name": "avg_vibration",
-                      "expression": "`avg_vibration`"
-                    },
-                    {
-                      "name": "max_vibration",
-                      "expression": "`max_vibration`"
-                    },
-                    {
-                      "name": "avg_temperature",
-                      "expression": "`avg_temperature`"
-                    },
-                    {
-                      "name": "max_temperature",
-                      "expression": "`max_temperature`"
-                    },
-                    {
                       "name": "avg_pressure",
                       "expression": "`avg_pressure`"
-                    },
-                    {
-                      "name": "reading_count",
-                      "expression": "`reading_count`"
                     }
                   ],
                   "disaggregated": true
@@ -368,102 +364,130 @@
             ],
             "spec": {
               "version": 3,
-              "widgetType": "table",
+              "widgetType": "bar",
               "encodings": {
-                "columns": [
-                  {
-                    "fieldName": "equipment_id",
-                    "displayName": "장비 ID",
-                    "scale": {
-                      "type": "categorical"
-                    }
-                  },
-                  {
-                    "fieldName": "equipment_name",
-                    "displayName": "장비명",
-                    "scale": {
-                      "type": "categorical"
-                    }
-                  },
-                  {
-                    "fieldName": "line",
-                    "displayName": "생산라인",
-                    "scale": {
-                      "type": "categorical"
-                    }
-                  },
-                  {
-                    "fieldName": "criticality",
-                    "displayName": "중요도",
-                    "scale": {
-                      "type": "categorical"
-                    }
-                  },
-                  {
-                    "fieldName": "status",
-                    "displayName": "상태",
-                    "scale": {
-                      "type": "categorical"
-                    }
-                  },
-                  {
-                    "fieldName": "operating_hours",
-                    "displayName": "운전시간(h)",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "avg_vibration",
-                    "displayName": "평균진동",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "max_vibration",
-                    "displayName": "최대진동",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "avg_temperature",
-                    "displayName": "평균온도",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "max_temperature",
-                    "displayName": "최대온도",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "avg_pressure",
-                    "displayName": "압력",
-                    "scale": {
-                      "type": "quantitative"
-                    }
-                  },
-                  {
-                    "fieldName": "reading_count",
-                    "displayName": "측정수",
-                    "scale": {
-                      "type": "quantitative"
-                    }
+                "x": {
+                  "fieldName": "equipment_name",
+                  "displayName": "장비",
+                  "scale": {
+                    "type": "categorical"
                   }
-                ]
+                },
+                "y": {
+                  "fieldName": "avg_pressure",
+                  "displayName": "평균 압력 (bar)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 4,
+            "width": 4,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "w_max_vib_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_equip_max_vib",
+                  "fields": [
+                    {
+                      "name": "equipment_name",
+                      "expression": "`equipment_name`"
+                    },
+                    {
+                      "name": "max_vibration",
+                      "expression": "`max_vibration`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "equipment_name",
+                  "displayName": "장비",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "max_vibration",
+                  "displayName": "최대 진동 (RMS)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
               }
             }
           },
           "position": {
             "x": 0,
-            "y": 6,
-            "width": 12,
-            "height": 6
+            "y": 8,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "w_line_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_line_vib",
+                  "fields": [
+                    {
+                      "name": "line",
+                      "expression": "`line`"
+                    },
+                    {
+                      "name": "avg_vibration",
+                      "expression": "`avg_vibration`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "line",
+                  "displayName": "생산라인",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg_vibration",
+                  "displayName": "평균 진동",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 8,
+            "width": 6,
+            "height": 4
           }
         }
       ],
