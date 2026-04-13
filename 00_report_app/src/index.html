@@ -44,7 +44,7 @@
         <p>예측 정비 (Predictive Maintenance) 시나리오 기반 - 13개 Databricks 기능 DAB 배포 검증</p>
         <div class="meta-info">
             <span>테스트 일시: 2026-04-03</span>
-            <span>워크스페이스: fevm-ebay-anomaly-detection</span>
+            <span>워크스페이스: (your-workspace)</span>
             <span>카탈로그: ebay_anomaly_detection_catalog</span>
         </div>
     </header>
@@ -63,49 +63,49 @@
         <tbody>
             <tr><td>1</td><td><strong>Notebook</strong></td><td><code>jobs</code> (notebook_task)</td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/02_notebook" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/editor/notebooks/3590947964456485?o=7474657547399276#command/6432286664559444" class="link-btn databricks" target="_blank">Notebook</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">DAB sync로 워크스페이스 자동 업로드. EDA: 센서 데이터 8,000건 생성</td></tr>
             <tr><td>2</td><td><strong>Job (Workflow)</strong></td><td><code>jobs</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/03_job" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/341789730629397/tasks?o=7474657547399276" class="link-btn databricks" target="_blank">Job</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">멀티태스크 Job (3단계): 수집 → 분석 → 알림. 스케줄/알림 설정</td></tr>
             <tr><td>3</td><td><strong>SDP Pipeline (Lakeflow)</strong></td><td><code>pipelines</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/04_dlt_pipeline" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/pipelines/a00b20b6-733c-4434-ad69-314ef2378465/updates/d9a0ac94-17db-4299-8348-5f0ccfef21f4?o=7474657547399276" class="link-btn databricks" target="_blank">Pipeline</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">Medallion (Bronze→Silver→Gold), Serverless, DLT Expectations</td></tr>
             <tr><td>4</td><td><strong>Lakebase</strong></td><td><code>postgres_projects</code> + <code>postgres_branches</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/05_lakebase" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/lakebase/projects" class="link-btn databricks" target="_blank">Lakebase</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td style="color:#94a3b8;font-size:13px;">자동 프로비저닝</td>
                 <td class="notes">PostgreSQL 17, Autoscaling, RW Endpoint. CLI v0.295+ 필요</td></tr>
             <tr><td>5</td><td><strong>Databricks App</strong></td><td><code>apps</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/06_databricks_app" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://pm-dashboard-app-hg-7474657547399276.aws.databricksapps.com/" class="link-btn databricks" target="_blank">App</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">App 실행 중</span></td>
                 <td class="notes">FastAPI 대시보드, SQL Warehouse 바인딩</td></tr>
             <tr><td>6</td><td><strong>AI/BI Dashboard</strong></td><td><code>dashboards</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/07_aibi_dashboard" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/dashboardsv3/01f12e3ae7f0184499dc7b6d0ace8b9e/published?o=7474657547399276" class="link-btn databricks" target="_blank">Dashboard</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td style="color:#94a3b8;font-size:13px;">즉시 조회 가능</td>
                 <td class="notes">Lakeview JSON, 2페이지 12위젯 (바차트 + 라인 + 산점도)</td></tr>
             <tr><td>7</td><td><strong>ML Custom Model</strong></td><td><code>experiments</code> + <code>registered_models</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/10_ml_custom_model" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/explore/data/models/ebay_anomaly_detection_catalog/predictive_maintenance/dev_hongguen_park_rul_prediction_model?o=7474657547399276" class="link-btn databricks" target="_blank">Model</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">LightGBM RUL 예측 모델, MLflow + UC 레지스트리</td></tr>
             <tr><td>8</td><td><strong>Model Serving</strong></td><td><code>model_serving_endpoints</code></td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/11_model_serving" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/ml/endpoints/dev_hongguen_park_pm-rul-prediction-hg?o=7474657547399276" class="link-btn databricks" target="_blank">Endpoint</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td style="color:#94a3b8;font-size:13px;">Endpoint 활성</td>
                 <td class="notes">Scale-to-zero, AI Gateway inference table</td></tr>
@@ -119,25 +119,25 @@
         <tbody>
             <tr><td>9</td><td><strong>Unity Catalog Function</strong></td><td>SQL notebook (<code>CREATE FUNCTION</code>)</td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/01_unity_catalog_function" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/731455833638601/runs/735380070821112?o=7474657547399276" class="link-btn databricks" target="_blank">Run</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">3개 함수: assess_vibration_status, estimate_rul, maintenance_priority_score</td></tr>
             <tr><td>10</td><td><strong>Metric View</strong></td><td>SQL notebook (<code>CREATE VIEW WITH METRICS</code>)</td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/09_metric_view" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/844201380172727/runs/54784606581764?o=7474657547399276" class="link-btn databricks" target="_blank">Run</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">3개 Metric View: 가동률, 건강종합, OEE. Genie 연동</td></tr>
             <tr><td>11</td><td><strong>Genie</strong></td><td>Python notebook (REST API)</td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/08_genie" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/485252954971199/runs/341376296644602?o=7474657547399276" class="link-btn databricks" target="_blank">Run</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">serialized_space.data_sources.tables[].identifier로 Metric View 연결</td></tr>
             <tr><td>12</td><td><strong>AgentBricks Knowledge Assistant</strong></td><td>Python notebook (SDK <code>w.knowledge_assistants</code>)</td>
                 <td><a href="https://github.com/hongguen-park_data/dab-predictive-maintenance/tree/main/12_agent_knowledge_assistant" class="link-btn github" target="_blank">GitHub</a></td>
-                <td><a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com/jobs/998475660276268/runs/829770698906712?o=7474657547399276" class="link-btn databricks" target="_blank">Run</a></td>
+                <td><span class="badge badge-deployed">배포 후 확인</span></td>
                 <td><span class="badge badge-deployed">완료</span></td>
                 <td><span class="badge badge-success">실행 성공</span></td>
                 <td class="notes">SDK로 Assistant 생성 + UC Volume Knowledge Source 연결</td></tr>
@@ -156,7 +156,7 @@
     <div class="section-title">관련 링크</div>
     <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:30px;">
         <a href="https://github.com/hongguen-park_data/dab-predictive-maintenance" class="link-btn github" target="_blank" style="font-size:14px;padding:8px 16px;">GitHub Repository</a>
-        <a href="https://fevm-ebay-anomaly-detection.cloud.databricks.com" class="link-btn databricks" target="_blank" style="font-size:14px;padding:8px 16px;">Databricks Workspace</a>
+        
         <a href="https://docs.databricks.com/dev-tools/bundles/index.html" class="link-btn" target="_blank" style="font-size:14px;padding:8px 16px;">DAB 공식 문서</a>
     </div>
     <div class="footer">Generated by DAB Feature Test | Honggeun Park | 2026-04-03</div>

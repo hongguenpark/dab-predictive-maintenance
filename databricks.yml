@@ -2,8 +2,8 @@ bundle:
   name: predictive-maintenance
 
 workspace:
-  host: https://fevm-ebay-anomaly-detection.cloud.databricks.com
-  profile: fe-vm-ebay-anomaly-detection
+  host: https://your-workspace.cloud.databricks.com
+  # profile: your-profile
 
 include:
   - "00_report_app/databricks.yml"
@@ -25,7 +25,7 @@ targets:
     mode: development
     default: true
     workspace:
-      root_path: /Users/hongguen.park@databricks.com/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
   prod:
     mode: production
     workspace:
